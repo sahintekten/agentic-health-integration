@@ -32,8 +32,21 @@ public sealed class Federation
     public List<AdapterInfo> Adapters { get; private set; } = new();
     public DateTime? IndexedAt { get; private set; }
 
-    public List<AdapterInfo> LoadAdapters() =>
-        JsonSerializer.Deserialize<List<AdapterInfo>>(File.ReadAllText(_adaptersFile), Plain) ?? new();
+    /// <summary>Reads the adapter list. A file that is still being written is read again.</summary>
+    public List<AdapterInfo> LoadAdapters()
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<List<AdapterInfo>>(File.ReadAllText(_adaptersFile), Plain) ?? new();
+            }
+            catch (JsonException) when (attempt < 5)
+            {
+                Thread.Sleep(200 * attempt);
+            }
+        }
+    }
 
     /// <summary>Reads every Patient from every adapter and rebuilds the index.</summary>
     public async Task<object> ReindexAsync(CancellationToken ct = default)

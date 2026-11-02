@@ -35,11 +35,18 @@ def unregister(system):
     return _reindex()
 
 
-def _reindex():
-    try:
-        return httpx.post(f"{GATEWAY}/admin/reindex", timeout=120).json()
-    except httpx.HTTPError as exc:
-        return {"error": f"gateway not reachable ({exc.__class__.__name__}); start it with make up-adapters"}
+def _reindex(attempts=5):
+    """Ask the gateway to rebuild its index. Docker file sharing can be a moment behind, so retry."""
+    for attempt in range(attempts):
+        try:
+            response = httpx.post(f"{GATEWAY}/admin/reindex", timeout=120)
+            if response.status_code == 200:
+                return response.json()
+        except httpx.HTTPError as exc:
+            if attempt == attempts - 1:
+                return {"error": f"gateway not reachable ({exc.__class__.__name__}); start it with make up-adapters"}
+        time.sleep(1 + attempt)
+    return {"error": "the gateway could not rebuild its index"}
 
 
 def start_adapter(system):
