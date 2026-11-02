@@ -13,6 +13,8 @@ from agents import config
 STEP_FILES = {
     "discover": ["inventory.json", "profile.json"],
     "design": ["mapping.yaml", "openapi.yaml", "id_strategy.md"],
+    "generate": ["generate.json"],
+    "validate": ["validate/summary.json"],
 }
 
 
