@@ -25,14 +25,5 @@
       "Patient",
       "Encounter"
     ]
-  },
-  {
-    "name": "d",
-    "system": "appointments-export",
-    "url": "http://adapter-d:8080",
-    "resources": [
-      "Patient",
-      "Encounter"
-    ]
   }
 ]
