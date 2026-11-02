@@ -1,0 +1,107 @@
+openapi: 3.0.1
+info:
+  title: PRS Patient Registry Service
+  version: "1.4"
+  description: Patient registry REST interface for downstream systems. Last reviewed March 2019.
+servers:
+  - url: http://localhost:8001
+paths:
+  /patients:
+    get:
+      summary: List patients
+      parameters:
+        - name: pg
+          in: query
+          description: Page number, starts at 1
+          schema:
+            type: integer
+            default: 1
+        - name: sz
+          in: query
+          description: Page size, max 100
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: One page of patients
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatientPage"
+  /patients/{pt_id}:
+    get:
+      summary: Get one patient by registry id
+      parameters:
+        - name: pt_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: MRN-004521
+      responses:
+        "200":
+          description: The patient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "404":
+          description: No patient with this id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    PatientPage:
+      type: object
+      properties:
+        pg:
+          type: integer
+        sz:
+          type: integer
+        tot:
+          type: integer
+          description: Total number of patients
+        recs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Patient"
+    Patient:
+      type: object
+      properties:
+        pt_id:
+          type: string
+          description: Registry patient id (MRN)
+          example: MRN-004521
+        nm_full:
+          type: string
+          description: Full name as SURNAME, FORENAMES
+          example: SMITH, JOHN
+        dob:
+          type: string
+          description: Date of birth in MM/DD/YYYY format
+          example: 07/03/1985
+        sx:
+          type: string
+          description: Sex
+          enum: [M, F, U]
+        addr_line:
+          type: string
+          description: Street address
+        town:
+          type: string
+        post_cd:
+          type: string
+          description: Postal code
+        mrtl:
+          type: string
+          description: Marital status code
+    Error:
+      type: object
+      properties:
+        err:
+          type: string
+        msg:
+          type: string
