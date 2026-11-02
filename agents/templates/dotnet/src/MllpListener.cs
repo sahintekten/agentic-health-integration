@@ -62,13 +62,14 @@ public sealed class MllpListener : BackgroundService
                     var text = Encoding.UTF8.GetString(buffer.GetRange(start + 1, end - start - 1).ToArray());
                     buffer.RemoveRange(0, end + 2);
                     var record = Hl7Message.Flatten(text);
-                    var ok = record.Get("MSH-10") is not null;
+                    var controlId = record.Get("MSH-10");
+                    var ok = controlId is not null;
                     if (ok)
                         _store.AddPushed(record);
                     var ack = Ack(record, ok ? "AA" : "AR");
                     await stream.WriteAsync(new[] { Start }.Concat(Encoding.UTF8.GetBytes(ack)).Concat(new[] { End, Cr }).ToArray(), ct);
                     // only the control id and the result: never log patient data
-                    _log.LogInformation("MLLP message {ControlId} -> {Code}", record.Get("MSH-10"), ok ? "AA" : "AR");
+                    _log.LogInformation("MLLP message {ControlId} -> {Code}", controlId, ok ? "AA" : "AR");
                 }
             }
         }
