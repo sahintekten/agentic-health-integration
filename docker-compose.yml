@@ -86,3 +86,35 @@ services:
     depends_on:
       adt-feed:
         condition: service_healthy
+
+  adapter-d:
+    profiles: [demo]
+    build: ./generated/d
+    ports:
+      - "9004:8080"
+    environment:
+      EXPORT_DIR: /data/export
+    volumes:
+      - ./mock-systems/appointments-export/out:/data/export:ro
+
+  # single FHIR entry point over the adapters (phase 4)
+  gateway:
+    profiles: [adapters]
+    build: ./gateway
+    ports:
+      - "9000:8080"
+    environment:
+      ADAPTERS_FILE: /config/adapters.json
+      INDEX_DB: /data/index.db
+      RECON_DIR: /workspace
+    volumes:
+      - ./gateway/adapters.json:/config/adapters.json:ro
+      - gateway-data:/data
+      - ./workspace:/workspace:ro
+    depends_on:
+      - adapter-a
+      - adapter-b
+      - adapter-c
+
+volumes:
+  gateway-data:
