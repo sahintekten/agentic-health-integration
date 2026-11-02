@@ -1,5 +1,0 @@
-[
-  {"name": "a", "system": "patient-registry-api", "url": "http://adapter-a:8080", "resources": ["Patient"], "master": true},
-  {"name": "b", "system": "lab-db", "url": "http://adapter-b:8080", "resources": ["Patient", "Observation"]},
-  {"name": "c", "system": "adt-feed", "url": "http://adapter-c:8080", "resources": ["Patient", "Encounter"]}
-]

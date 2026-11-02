@@ -108,7 +108,8 @@ services:
       INDEX_DB: /data/index.db
       RECON_DIR: /workspace
     volumes:
-      - ./gateway/adapters.json:/config/adapters.json:ro
+      # mount the folder, not the file: a replaced file would not show up in the container
+      - ./gateway/config:/config:ro
       - gateway-data:/data
       - ./workspace:/workspace:ro
     depends_on:

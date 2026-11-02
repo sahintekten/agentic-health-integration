@@ -10,7 +10,7 @@ import httpx
 
 from agents import config
 
-ADAPTERS_FILE = config.ROOT / "gateway" / "adapters.json"
+ADAPTERS_FILE = config.ROOT / "gateway" / "config" / "adapters.json"
 GATEWAY = "http://localhost:9000"
 
 

@@ -26,7 +26,7 @@ public sealed class Federation
         _http = http;
         _store = store;
         _log = log;
-        _adaptersFile = config["ADAPTERS_FILE"] ?? "adapters.json";
+        _adaptersFile = config["ADAPTERS_FILE"] ?? "config/adapters.json";
     }
 
     public List<AdapterInfo> Adapters { get; private set; } = new();
