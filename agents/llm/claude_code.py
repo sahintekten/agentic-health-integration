@@ -45,6 +45,9 @@ class ClaudeCode(Provider):
         usage = data.get("usage") or {}
         return Result(
             text=data.get("result", ""),
-            prompt_tokens=usage.get("input_tokens", 0),
+            # most of the prompt is reported under the cache fields, so add them up
+            prompt_tokens=usage.get("input_tokens", 0)
+            + usage.get("cache_creation_input_tokens", 0)
+            + usage.get("cache_read_input_tokens", 0),
             completion_tokens=usage.get("output_tokens", 0),
         )
