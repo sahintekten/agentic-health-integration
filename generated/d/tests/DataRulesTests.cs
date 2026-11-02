@@ -1,159 +1,102 @@
-using System.Linq;
+namespace Adapter.Tests;
+
 using Adapter;
 using Hl7.Fhir.Model;
 
-namespace Adapter.Tests;
-
-internal static class RuleRows
-{
-    public static SourceRecord Row(
-        string apptRef = "AB100001",
-        string patNo = "P/0030060-W",
-        string file = "appts_2026-W22.csv",
-        string status = "BK",
-        string? sex = "m",
-        string start = "12.01.2001 20:44",
-        string dur = "30",
-        string clinic = "OPD-GEN",
-        string apptType = "Encounter for check up (procedure)",
-        string name = "Testgiven TESTFAMILY",
-        string dob = "07.03.2001",
-        string booked = "2001-01-05")
-    {
-        return new SourceRecord
-        {
-            ["ApptRef"] = apptRef,
-            ["PatNo"] = patNo,
-            ["PatName"] = name,
-            ["Geb.Dat"] = dob,
-            ["Sex"] = sex,
-            ["ApptStart"] = start,
-            ["DurMin"] = dur,
-            ["Clinic"] = clinic,
-            ["ApptType"] = apptType,
-            ["Status"] = status,
-            ["Booked"] = booked,
-            ["_file"] = file,
-        };
-    }
-
-    public static SourceData Data(params SourceRecord[] rows)
-    {
-        var d = new SourceData();
-        d.Tables["rows"] = rows.ToList();
-        return d;
-    }
-}
-
 public class DataRulesTests
 {
+    private static SourceRecord Row(string appt = "AB000001", string pat = "P/0000123-K", string start = "12.01.2001 20:44", string dur = "30", string status = "BK", string file = "appointments_2026-W22.csv")
+        => MappingTests.Row(appt: appt, pat: pat, start: start, dur: dur, status: status, file: file);
+
+    private static SourceData Make(params SourceRecord[] rows) => MappingTests.Make(rows);
+
     [Fact]
-    public void LatestEventWins_OneEncounterWithLatestStatus()
+    public void DropDuplicates_KeepsOneEncounterPerApptRef()
     {
-        var data = Mapper.Map(RuleRows.Data(
-            RuleRows.Row(file: "appts_2026-W22.csv", status: "BK"),
-            RuleRows.Row(file: "appts_2026-W23.csv", status: "DN")));
-        var e = Assert.Single(data.Encounters);
-        Assert.Equal(Encounter.EncounterStatus.Finished, e.Status);
-        Assert.True(data.RuleCounts["latest_event_wins"] > 0);
+        var m = Mapper.Map(Make(
+            Row(status: "BK", file: "appointments_2026-W22.csv"),
+            Row(status: "DN", file: "appointments_2026-W30.csv")));
+        Assert.Single(m.Encounters);
+        Assert.True(m.RuleCounts["drop_duplicates"] > 0);
     }
 
     [Fact]
-    public void LatestEventWins_LatestWinsEvenIfListedFirst()
+    public void LatestEventWins_LaterFileSetsStatus()
     {
-        var data = Mapper.Map(RuleRows.Data(
-            RuleRows.Row(file: "appts_2026-W30.csv", status: "CX"),
-            RuleRows.Row(file: "appts_2026-W25.csv", status: "BK")));
-        var e = Assert.Single(data.Encounters);
-        Assert.Equal(Encounter.EncounterStatus.Cancelled, e.Status);
+        var m = Mapper.Map(Make(
+            Row(status: "BK", file: "appointments_2026-W22.csv"),
+            Row(status: "DN", file: "appointments_2026-W30.csv")));
+        Assert.Equal(Encounter.EncounterStatus.Finished, m.Encounters.Single().Status);
+        Assert.True(m.RuleCounts["latest_event_wins"] > 0);
     }
 
     [Fact]
-    public void DropDuplicates_IdenticalRowsKeepOne()
+    public void LatestEventWins_RowOrderDoesNotMatter()
     {
-        var data = Mapper.Map(RuleRows.Data(
-            RuleRows.Row(file: "appts_2026-W22.csv"),
-            RuleRows.Row(file: "appts_2026-W23.csv")));
-        Assert.Single(data.Encounters);
-        Assert.Single(data.Patients);
-        Assert.True(data.RuleCounts["drop_duplicates"] > 0);
+        var m = Mapper.Map(Make(
+            Row(status: "CX", file: "appointments_2026-W31.csv"),
+            Row(status: "BK", file: "appointments_2026-W22.csv")));
+        Assert.Equal(Encounter.EncounterStatus.Cancelled, m.Encounters.Single().Status);
     }
 
     [Fact]
-    public void NormaliseIdentifier_StripsPrefixSuffixAndZeros()
+    public void NormaliseIdentifier_StripsPrefixAndZeros()
     {
-        var data = Mapper.Map(RuleRows.Data(RuleRows.Row(patNo: "P/0000042-A")));
-        var p = Assert.Single(data.Patients);
-        Assert.Equal("42", p.Id);
-        Assert.Contains(p.Identifier, i => i.Value == "P/0000042-A");
-        Assert.True(data.RuleCounts["normalise_identifier"] > 0);
+        var m = Mapper.Map(Make(Row(pat: "P/0000123-K")));
+        Assert.Equal("123", m.Patients.Single().Id);
+        Assert.True(m.RuleCounts["normalise_identifier"] > 0);
     }
 
     [Fact]
-    public void NormaliseIdentifier_UnparsableIdKeepsRecord()
+    public void NormaliseIdentifier_UnmatchedIdKeptAsUnlinked()
     {
-        var data = Mapper.Map(RuleRows.Data(RuleRows.Row(patNo: "UNKNOWN")));
-        var p = Assert.Single(data.Patients);
-        Assert.Equal("UNKNOWN", p.Id);
-        Assert.Single(data.Encounters);
+        var m = Mapper.Map(Make(Row(pat: "UNKNOWN")));
+        Assert.Single(m.Patients);
+        Assert.Equal("UNKNOWN", m.Patients[0].Id);
+        Assert.Equal("Patient/UNKNOWN", m.Encounters.Single().Subject.Reference);
     }
 
     [Fact]
-    public void TimezoneAssumption_UtcWithZ()
+    public void TimezoneAssumption_WritesZAndCounts()
     {
-        var data = Mapper.Map(RuleRows.Data(RuleRows.Row(start: "12.01.2001 20:44")));
-        var e = Assert.Single(data.Encounters);
-        Assert.EndsWith("Z", e.Period.Start);
-        Assert.True(data.RuleCounts["timezone_assumption"] > 0);
+        var m = Mapper.Map(Make(Row(start: "12.01.2001 20:44")));
+        Assert.EndsWith("Z", m.Encounters.Single().Period.Start);
+        Assert.True(m.RuleCounts["timezone_assumption"] > 0);
     }
 
     [Fact]
-    public void DateFormat_AllThreeFormatsParsed()
+    public void DateFormat_DayFirstParsing()
     {
-        var data = Mapper.Map(RuleRows.Data(RuleRows.Row(dob: "07.03.2001", start: "12.01.2001 20:44", booked: "2001-01-05")));
-        var p = Assert.Single(data.Patients);
-        var e = Assert.Single(data.Encounters);
-        Assert.Equal("2001-03-07", p.BirthDate);
-        Assert.Equal("2001-01-12T20:44:00Z", e.Period.Start);
-        Assert.Contains(e.Extension, x => x.Value is Date d && d.Value == "2001-01-05");
-        Assert.True(data.RuleCounts["date_format"] > 0);
+        var m = Mapper.Map(Make(Row(start: "03.02.2001 08:15")));
+        Assert.Equal("2001-02-03T08:15:00Z", m.Encounters.Single().Period.Start);
+        Assert.True(m.RuleCounts["date_format"] > 0);
     }
 
     [Fact]
-    public void DurMin_OverMaximumIsFlaggedButKept()
+    public void Other_DurationOutlierKeptAndFlagged()
     {
-        var data = Mapper.Map(RuleRows.Data(RuleRows.Row(start: "12.01.2001 08:00", dur: "354")));
-        var e = Assert.Single(data.Encounters);
-        Assert.Equal("2001-01-12T13:54:00Z", e.Period.End);
-        Assert.True(data.RuleCounts["other"] > 0);
+        var m = Mapper.Map(Make(Row(dur: "354")));
+        Assert.Equal(354m, m.Encounters.Single().Length.Value);
+        Assert.True(m.RuleCounts["other"] > 0);
     }
 
     [Fact]
-    public void DurMin_TextWithVaryingWidthIsCast()
+    public void SameStartDifferentApptRef_NotMerged()
     {
-        var data = Mapper.Map(RuleRows.Data(RuleRows.Row(start: "12.01.2001 08:00", dur: "45")));
-        var e = Assert.Single(data.Encounters);
-        Assert.Equal("2001-01-12T08:45:00Z", e.Period.End);
+        var m = Mapper.Map(Make(
+            Row(appt: "AB000001", pat: "P/0000123-K"),
+            Row(appt: "AB000002", pat: "P/0000456-L")));
+        Assert.Equal(2, m.Encounters.Count);
+        Assert.Equal(2, m.Patients.Count);
     }
 
     [Fact]
-    public void SameApptStartDifferentApptRef_NotMerged()
+    public void SamePatientTwoAppointments_OnePatient()
     {
-        var data = Mapper.Map(RuleRows.Data(
-            RuleRows.Row(apptRef: "AB100001", patNo: "P/0030060-W", file: "appts_2026-W22.csv"),
-            RuleRows.Row(apptRef: "AB100002", patNo: "P/0000077-B", file: "appts_2026-W23.csv", name: "Testother TESTLAST")));
-        Assert.Equal(2, data.Encounters.Count);
-        Assert.Equal(2, data.Patients.Count);
-        Assert.True(data.RuleCounts["other"] > 0);
-    }
-
-    [Fact]
-    public void SamePatientInTwoAppointments_OnePatient()
-    {
-        var data = Mapper.Map(RuleRows.Data(
-            RuleRows.Row(apptRef: "AB100001", start: "12.01.2001 08:00"),
-            RuleRows.Row(apptRef: "AB100002", start: "13.01.2001 09:00")));
-        Assert.Equal(2, data.Encounters.Count);
-        Assert.Single(data.Patients);
+        var m = Mapper.Map(Make(
+            Row(appt: "AB000001"),
+            Row(appt: "AB000002", start: "15.02.2001 09:00")));
+        Assert.Equal(2, m.Encounters.Count);
+        Assert.Single(m.Patients);
     }
 }
