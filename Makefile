@@ -1,11 +1,14 @@
 PYTHON ?= python3
 VENV := .venv
 N ?= 5
+SYSTEM ?= a
+AGENT_FLAGS = $(if $(YES),--yes,)
 
 -include .env
 export
 
-.PHONY: help venv hooks data synthea transform up down seed smoke replay-adt send-adt lint
+.PHONY: help venv hooks data synthea transform up down seed smoke test replay-adt send-adt lint \
+	discover design agents score
 
 help:
 	@echo "make data         run Synthea (if needed) and build the seed files"
@@ -15,10 +18,15 @@ help:
 	@echo "make smoke        run the smoke tests"
 	@echo "make replay-adt   send every ADT message over MLLP"
 	@echo "make send-adt N=5 send the next N ADT messages (for a demo)"
+	@echo "make test         run all tests (smoke tests and the eval guard)"
+	@echo "make discover SYSTEM=a   run the discover agent (add YES=1 to skip the review prompt)"
+	@echo "make design SYSTEM=a     run the design agent"
+	@echo "make agents SYSTEM=all   run discover and design"
+	@echo "make score SYSTEM=a      score the mapping against the ground truth"
 	@echo "make lint         run all pre-commit checks"
 	@echo "make hooks        install the git hooks"
 
-$(VENV)/.installed: requirements-dev.txt tests/requirements.txt
+$(VENV)/.installed: requirements-dev.txt tests/requirements.txt agents/requirements.txt
 	$(PYTHON) -m venv $(VENV)
 	$(VENV)/bin/pip install -q --upgrade pip
 	$(VENV)/bin/pip install -q -r requirements-dev.txt
@@ -50,6 +58,21 @@ seed: transform
 
 smoke: venv
 	$(VENV)/bin/pytest -q tests/smoke
+
+test: venv
+	$(VENV)/bin/pytest -q tests
+
+discover: venv
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step discover $(AGENT_FLAGS)
+
+design: venv
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step design $(AGENT_FLAGS)
+
+agents: venv
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step all $(AGENT_FLAGS)
+
+score: venv
+	$(VENV)/bin/python eval/score.py --system $(SYSTEM)
 
 replay-adt:
 	docker compose exec -T adt-feed python feed.py replay
