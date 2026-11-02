@@ -10,7 +10,8 @@ Hospitals have many old systems that do not talk to each other. Each one stores 
 
 - Phase 1 is done: the repo, the synthetic data and three mock hospital systems.
 - Phase 2 is done: the LLM layer, the Discover agent, the Design agent, a review step and a scorer.
-- Phase 3 is in progress: data rules in Design, the Generate agent (.NET 8 adapters) and the Validate agent. System A is done; B and C are next.
+- Phase 3 is done: data rules in Design, the Generate agent (.NET 8 adapters) and the Validate agent, for systems A, B and C.
+- Phase 4 is done: a FHIR gateway with a patient index, a dashboard, a live demo that adds System D, and a harness for a hand-written baseline.
 
 ## How the agents work
 
@@ -20,7 +21,9 @@ The full pipeline has five steps:
 2. **Design**: map the fields to FHIR R4, list the data rules, write an API spec for the adapter and a patient ID plan. *(done)*
 3. **Generate**: write a .NET 8 adapter and its tests. *(done)*
 4. **Validate**: build, test and check the adapter, and repair it when something fails. *(done)*
-5. **Operate**: run the adapters behind a gateway and watch them. *(phase 4)*
+5. **Operate**: run the adapters behind a gateway and watch them on a dashboard. *(done)*
+
+See [docs/architecture.md](docs/architecture.md) for a diagram of the whole system.
 
 Discover first collects facts with plain code (`inventory.json`): field types, null rates, formats, duplicates, doc errors. Then a small LLM turns these facts into a profile (`profile.json`) with a meaning, format, PII flag and confidence for each field. The profile is checked against the inventory, so wrong guesses show up as `checks`.
 
@@ -41,6 +44,22 @@ python -m agents metrics                          # or: make metrics
 ```
 
 All outputs go to `workspace/<system>/`. The LLM cache is in `.cache/llm/` and every call is logged in `workspace/run_log.jsonl`. Both are ignored by git.
+
+## Gateway, dashboard and demo
+
+**Gateway** (`gateway/`, port 9000) is the single FHIR entry point. It serves `GET /fhir/Patient`, `/fhir/Observation`, `/fhir/Encounter` (with `?patient=`) and `/fhir/Patient/{id}/$everything`, and merges the results of all adapters. Its patient index (a small SQLite file) links records by the shared hospital number. When a record has another id but the same name and birth date as a registry patient, the gateway marks it as a *probable* link. The data of a probable link is only merged after a person approves it. `GET /health` shows every adapter, its counts and its last reconciliation.
+
+**Dashboard** (`dashboard/`, port 8050) has three pages: an overview (steps, F1 scores, validation, time and tokens per system, and the gateway health), a live pipeline view, and a review page for probable patient links.
+
+**Live demo.** `make demo-add-system SYSTEM=d` adds System D (a weekly appointments CSV export) from nothing: Discover, Design, Generate and Validate with the real review questions, then it starts the adapter and registers it in the gateway. `make demo-reset SYSTEM=d` removes it again.
+
+```bash
+make up && make up-adapters     # mock systems, adapters A-C and the gateway
+make dashboard                  # http://localhost:8050
+make demo-add-system SYSTEM=d   # the live demo
+```
+
+**Baseline.** `baseline/` is for a hand-written adapter for System A, so we can compare it with the generated one. `make validate-baseline SYSTEM=a` runs the same checks on it. See [baseline/README.md](baseline/README.md).
 
 ### LLM providers
 
@@ -63,11 +82,16 @@ Set `LLM_CACHE=0` to turn the cache off.
 | `mock-systems/patient-registry-api` | System A. A REST API with patient details (Python, FastAPI). |
 | `mock-systems/lab-db` | System B. An old style lab database (PostgreSQL). |
 | `mock-systems/adt-feed` | System C. An HL7 v2 ADT feed (MLLP over TCP, plus .hl7 files). |
+| `mock-systems/appointments-export` | System D. Weekly appointment exports as CSV files (for the live demo). |
 | `data/scripts` | A script that runs Synthea, and Python scripts that turn its CSV files into seed data for each system. |
 | `data/synthea` | Raw Synthea output. Not in git. |
 | `eval` | The correct mappings for each system (`ground_truth/`) and the scorer (`score.py`). |
 | `agents` | Python agents: LLM layer, Discover, Design and the review step. |
 | `generated` | The .NET 8 adapters written by the Generate agent, one folder per system, plus a FHIR check tool. |
+| `gateway` | The FHIR gateway with the patient index. |
+| `dashboard` | The dashboard (FastAPI, plain HTML). |
+| `baseline` | The harness for a hand-written adapter. |
+| `docs` | The architecture diagram. |
 | `tests` | Smoke tests for the three systems, and the eval guard test. |
 
 ## What you need
