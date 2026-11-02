@@ -10,27 +10,34 @@ Hospitals have many old systems that do not talk to each other. Each one stores 
 
 - Phase 1 is done: the repo, the synthetic data and three mock hospital systems.
 - Phase 2 is done: the LLM layer, the Discover agent, the Design agent, a review step and a scorer.
-- Phase 3 (generate .NET code) is next.
+- Phase 3 is in progress: data rules in Design, the Generate agent (.NET 8 adapters) and the Validate agent. System A is done; B and C are next.
 
 ## How the agents work
 
 The full pipeline has five steps:
 
 1. **Discover**: look at a system and describe every field. *(done)*
-2. **Design**: map the fields to FHIR R4, write an API spec for the adapter and a patient ID plan. *(done)*
-3. **Generate**: write the .NET 8 adapter code and tests. *(phase 3)*
-4. **Validate**: run the generated tests against the mock systems. *(later)*
-5. **Operate**: run the adapter and watch it. *(later)*
+2. **Design**: map the fields to FHIR R4, list the data rules, write an API spec for the adapter and a patient ID plan. *(done)*
+3. **Generate**: write a .NET 8 adapter and its tests. *(done)*
+4. **Validate**: build, test and check the adapter, and repair it when something fails. *(done)*
+5. **Operate**: run the adapters behind a gateway and watch them. *(phase 4)*
 
 Discover first collects facts with plain code (`inventory.json`): field types, null rates, formats, duplicates, doc errors. Then a small LLM turns these facts into a profile (`profile.json`) with a meaning, format, PII flag and confidence for each field. The profile is checked against the inventory, so wrong guesses show up as `checks`.
 
-Design gives the profile and a short FHIR R4 reference (`agents/fhir_ref/`) to a stronger LLM. It writes `mapping.yaml`, `openapi.yaml` and `id_strategy.md`.
+Design gives the profile, the inventory findings, the patient ID policy and a short FHIR R4 reference (`agents/fhir_ref/`) to a stronger LLM. It writes `mapping.yaml` (field mappings plus `data_rules` such as "drop duplicate rows" or "fall back to the default unit"), `openapi.yaml` and `id_strategy.md`.
 
-After each step you see a summary and answer `approve? [y/n/edit]`. Approved steps get a `reviewed_by` and `reviewed_at` stamp in `workspace/<system>/review.json`. Use `--yes` to skip the questions.
+Generate builds a .NET 8 minimal API project in `generated/<system>/`. Templates give the boring parts: project files, `Program.cs`, the source reader, the FHIR store and the Dockerfile. The LLM writes only `src/Mapper.cs` (the mapping and data rules) and the unit tests. The adapter uses the Firely SDK and serves `GET /fhir/Patient`, `/fhir/Observation` or `/fhir/Encounter` (with `?patient=`), plus `/fhir/metadata` and `/health`.
+
+Validate runs up to 5 rounds. Each round builds the code, runs the tests, starts the adapter and checks it: FHIR validation with the Firely validator, the generated `openapi.yaml`, a scan for real patient values in code and logs, and a reconciliation of resource counts against the source after the data rules. Each round writes a report to `workspace/<system>/validate/`.
+
+**Self-healing.** When a check fails, Validate sends the failing output to the LLM and asks for a fixed `src/Mapper.cs`. The LLM may fix a compile error inside a test file, but it may not delete a test, remove or loosen an assertion, or skip a test. The agent counts tests and assertions before and after each change and refuses any change that lowers them. It can never edit the templates, the integration tests or the source systems.
+
+After each step you see a summary and answer `approve? [y/n/edit]`. Approved steps get a `reviewed_by` and `reviewed_at` stamp in `workspace/<system>/review.json`. Use `--yes` to skip the questions. Metrics per system (time, LLM calls and tokens, repairs, test pass rate, lines of code) go to `workspace/metrics.json`.
 
 ```bash
-python -m agents run --system a --step all     # or: make agents SYSTEM=a
-python eval/score.py --system a                # or: make score SYSTEM=a
+python -m agents run --system a --step pipeline   # or: make pipeline SYSTEM=a
+python eval/score.py --system a                   # or: make score SYSTEM=a
+python -m agents metrics                          # or: make metrics
 ```
 
 All outputs go to `workspace/<system>/`. The LLM cache is in `.cache/llm/` and every call is logged in `workspace/run_log.jsonl`. Both are ignored by git.
@@ -60,7 +67,7 @@ Set `LLM_CACHE=0` to turn the cache off.
 | `data/synthea` | Raw Synthea output. Not in git. |
 | `eval` | The correct mappings for each system (`ground_truth/`) and the scorer (`score.py`). |
 | `agents` | Python agents: LLM layer, Discover, Design and the review step. |
-| `generated` | .NET code that the agents will write. Empty for now. |
+| `generated` | The .NET 8 adapters written by the Generate agent, one folder per system, plus a FHIR check tool. |
 | `tests` | Smoke tests for the three systems, and the eval guard test. |
 
 ## What you need
