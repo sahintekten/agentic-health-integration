@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: pre-commit
+        run: |
+          pip install pre-commit==4.0.1
+          pre-commit run --all-files --show-diff-on-failure
+      - name: gitleaks on full history
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.21.2 git /repo --redact --verbose
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: start mock systems
+        run: docker compose up -d --build --wait
+      - name: smoke tests
+        run: |
+          pip install -r tests/requirements.txt
+          pytest -q tests/smoke
+      - name: logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: stop
+        if: always()
+        run: docker compose down -v
