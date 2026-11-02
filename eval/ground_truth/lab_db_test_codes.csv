@@ -1,0 +1,29 @@
+tst_cd,loinc,display,ucum_unit,category,loinc_in_source,active
+BUN,6299-2,Urea nitrogen [Mass/volume] in Blood,mg/dL,laboratory,yes,Y
+CA,49765-1,Calcium [Mass/volume] in Blood,mg/dL,laboratory,yes,Y
+CHOL,2093-3,Cholesterol [Mass/volume] in Serum or Plasma,mg/dL,laboratory,yes,Y
+CL,2069-3,Chloride [Moles/volume] in Blood,mmol/L,laboratory,no,Y
+CO2,20565-8,Carbon dioxide  total [Moles/volume] in Blood,mmol/L,laboratory,yes,Y
+CREA,38483-4,Creatinine [Mass/volume] in Blood,mg/dL,laboratory,yes,Y
+EGFR,33914-3,Glomerular filtration rate [Volume Rate/Area] in Serum or Plasma by Creatinine-based formula (MDRD)/1.73 sq M,mL/min,laboratory,no,Y
+ESR,30341-2,Erythrocyte sedimentation rate,mm/h,laboratory,yes,N
+GLU,2339-0,Glucose [Mass/volume] in Blood,mg/dL,laboratory,yes,Y
+GLUS,2345-7,Glucose [Mass/volume] in Serum or Plasma,mg/dL,laboratory,no,Y
+HBA1C,4548-4,Hemoglobin A1c/Hemoglobin.total in Blood,%,laboratory,yes,Y
+HDL,2085-9,Cholesterol in HDL [Mass/volume] in Serum or Plasma,mg/dL,laboratory,yes,Y
+HGB,718-7,Hemoglobin [Mass/volume] in Blood,g/dL,laboratory,no,Y
+K,6298-4,Potassium [Moles/volume] in Blood,mmol/L,laboratory,yes,Y
+LDLD,18262-6,Cholesterol in LDL [Mass/volume] in Serum or Plasma by Direct assay,mg/dL,laboratory,yes,Y
+NA,2947-0,Sodium [Moles/volume] in Blood,mmol/L,laboratory,yes,Y
+PLT,777-3,Platelets [#/volume] in Blood by Automated count,10*3/uL,laboratory,no,Y
+TRIG,2571-8,Triglyceride [Mass/volume] in Serum or Plasma,mg/dL,laboratory,no,Y
+V100,8302-2,Body Height,cm,vital-signs,yes,Y
+V105,8302-2,Body Height,[in_i],vital-signs,no,N
+V110,29463-7,Body Weight,kg,vital-signs,yes,Y
+V120,39156-5,Body mass index (BMI) [Ratio],kg/m2,vital-signs,no,Y
+V200,8480-6,Systolic Blood Pressure,mm[Hg],vital-signs,yes,Y
+V201,8462-4,Diastolic Blood Pressure,mm[Hg],vital-signs,yes,Y
+V300,8867-4,Heart rate,/min,vital-signs,yes,Y
+V310,9279-1,Respiratory rate,/min,vital-signs,no,Y
+V400,2708-6,Oxygen saturation in Arterial blood,%,vital-signs,yes,Y
+WBC,6690-2,Leukocytes [#/volume] in Blood by Automated count,10*3/uL,laboratory,yes,Y

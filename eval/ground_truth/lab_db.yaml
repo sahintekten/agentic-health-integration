@@ -1,0 +1,130 @@
+system: lab-db
+interface: PostgreSQL, port 5433, database labdb
+fhir_version: R4
+
+identifier_systems:
+  lab_pt_ref: http://hospital.example.org/fhir/sid/lab-pt-ref
+  hospital_number: http://hospital.example.org/fhir/sid/hospital-number
+  lab_result_id: http://hospital.example.org/fhir/sid/lab-result-id
+  lab_test_code: http://hospital.example.org/fhir/CodeSystem/lab-test-code
+
+tables:
+  LB_PT: Patient
+  LB_RSLT: Observation
+  LB_TST_CODES: lookup table for Observation.code (not a resource)
+
+known_traps:
+  - No primary keys, foreign keys or comments in the schema.
+  - Duplicate results. Rows in LB_RSLT with the same PT_REF, TST_CD, RSLT_DT and trimmed LB_VAL1 are one result sent twice (the copy has ENT_USR = INTFC). Keep the row with the lowest RSLT_ID.
+  - PT_REF 999999 (ZZTEST PATIENT) is a test patient. Skip its LB_PT row and all its results.
+  - UOM is null on about 3% of rows. Use LB_TST_CODES.DFLT_UOM for that TST_CD.
+  - LB_VAL1 is text and can have leading spaces. Trim before parsing.
+  - Three patients were registered again in the lab and have a PT_REF of 900000 or more. That number does not match the hospital number. Link them by name and date of birth.
+  - LOINC_CD is empty for about 30% of codes. The true LOINC for every code is in lab_db_test_codes.csv.
+  - Codes with ACTV_FLG = N are old and have no results.
+  - PT_NM is cut at 20 characters.
+  - Blood pressure is stored as two separate tests (V200, V201), not as one panel.
+
+patient_link:
+  rule: PT_REF is the hospital number when it is below 900000. Otherwise match on name and date of birth.
+  answer_key: patient_crosswalk.csv
+
+mappings:
+  LB_PT:
+    - source: PT_REF
+      resource: Patient
+      path: Patient.identifier[lab_pt_ref].value
+      transform: Integer to string.
+    - source: PT_REF
+      resource: Patient
+      path: Patient.identifier[hospital_number].value
+      transform: Same number when below 900000. For 9xxxxx values use the crosswalk.
+    - source: PT_NM
+      resource: Patient
+      path: Patient.name[0]
+      transform: '"SURNAME FORENAME" with no comma. First word is family, the rest is given. May be cut at 20 characters.'
+    - source: PT_DOB
+      resource: Patient
+      path: Patient.birthDate
+      transform: Integer YYYYMMDD -> YYYY-MM-DD (19591216 -> 1959-12-16).
+    - source: PT_SX
+      resource: Patient
+      path: Patient.gender
+      value_map: {1: male, 2: female, 9: unknown}
+    - source: CRT_DT
+      ignore: record created time (epoch seconds)
+
+  LB_RSLT:
+    - source: RSLT_ID
+      resource: Observation
+      path: Observation.identifier[lab_result_id].value
+      transform: Integer to string.
+    - source: PT_REF
+      resource: Observation
+      path: Observation.subject
+      transform: Reference to the Patient found with the patient link rule.
+    - source: TST_CD
+      resource: Observation
+      path: Observation.code.coding
+      transform: >
+        Two codings. LOINC (system http://loinc.org) from LB_TST_CODES.LOINC_CD, or from
+        lab_db_test_codes.csv when it is empty. Plus the local code (system lab_test_code,
+        code TST_CD, display TST_DESC).
+    - source: TST_CD
+      resource: Observation
+      path: Observation.category
+      transform: vital-signs or laboratory (see lab_db_test_codes.csv). System http://terminology.hl7.org/CodeSystem/observation-category.
+    - source: LB_VAL1
+      resource: Observation
+      path: Observation.valueQuantity.value
+      transform: Trim, then parse as a decimal.
+    - source: UOM
+      resource: Observation
+      path: Observation.valueQuantity.unit and Observation.valueQuantity.code
+      transform: Map the legacy unit to UCUM with unit_map (system http://unitsofmeasure.org). If null, use LB_TST_CODES.DFLT_UOM.
+    - source: RSLT_DT
+      resource: Observation
+      path: Observation.effectiveDateTime
+      transform: Epoch seconds in UTC -> ISO 8601 (1452631463 -> 2016-01-12T20:44:23Z).
+    - source: FLG
+      resource: Observation
+      path: Observation.interpretation
+      transform: System http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation. null -> leave out.
+      value_map: {H: H, L: L, N: N}
+    - source: STS
+      resource: Observation
+      path: Observation.status
+      value_map: {F: final, C: corrected}
+    - source: LB_VAL2
+      ignore: old column, almost always empty
+    - source: ENT_USR
+      ignore: user or interface that entered the row
+
+  LB_TST_CODES:
+    - source: TST_CD
+      lookup: join key for LB_RSLT.TST_CD
+    - source: TST_DESC
+      lookup: display of the local coding
+    - source: LOINC_CD
+      lookup: LOINC coding (incomplete, see lab_db_test_codes.csv)
+    - source: DFLT_UOM
+      lookup: unit to use when LB_RSLT.UOM is null
+    - source: ACTV_FLG
+      ignore: active flag
+
+unit_map:
+  CM: cm
+  KG: kg
+  KG/M2: kg/m2
+  MMHG: mm[Hg]
+  BPM: /min
+  BR/MIN: /min
+  PCT: "%"
+  "%": "%"
+  MG/DL: mg/dL
+  MMOL/L: mmol/L
+  G/DL: g/dL
+  X10E3/UL: 10*3/uL
+  ML/MIN: mL/min
+  IN: "[in_i]"
+  MM/HR: mm/h

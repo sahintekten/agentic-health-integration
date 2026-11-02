@@ -1,0 +1,87 @@
+system: patient-registry-api
+interface: REST JSON over HTTP, port 8001
+fhir_version: R4
+
+identifier_systems:
+  registry_mrn: http://hospital.example.org/fhir/sid/registry-mrn
+  hospital_number: http://hospital.example.org/fhir/sid/hospital-number
+
+known_traps:
+  - The OpenAPI document says dob is MM/DD/YYYY. This is wrong. The real format is DD/MM/YYYY.
+  - The field dcsd (date of death) is not in the OpenAPI document.
+  - GET /health is not in the OpenAPI document.
+  - About 30% of post_cd values lost their leading zero (2171 instead of 02171).
+  - Some nm_full values have extra spaces.
+  - About 3% of records have sx = U even if other systems know the sex.
+  - pg, sz, tot and recs are the paging envelope, not patient data.
+
+patient_link:
+  rule: Take pt_id, remove the "MRN-" prefix and leading zeros. The result is the hospital number.
+  example: MRN-004521 -> 4521
+  answer_key: patient_crosswalk.csv
+
+mappings:
+  - source: pt_id
+    resource: Patient
+    path: Patient.identifier[registry_mrn].value
+    transform: Copy as is (MRN-004521). Identifier type MR.
+
+  - source: pt_id
+    resource: Patient
+    path: Patient.identifier[hospital_number].value
+    transform: Remove "MRN-" and leading zeros (MRN-004521 -> 4521). This links the patient to systems B and C.
+
+  - source: nm_full
+    resource: Patient
+    path: Patient.name[0].family
+    transform: Trim and collapse spaces. The text before the comma. Source is upper case; title case is optional.
+
+  - source: nm_full
+    resource: Patient
+    path: Patient.name[0].given
+    transform: The text after the comma, split on spaces. First word is given[0], the rest are middle names.
+
+  - source: dob
+    resource: Patient
+    path: Patient.birthDate
+    transform: DD/MM/YYYY -> YYYY-MM-DD (16/12/1959 -> 1959-12-16).
+
+  - source: sx
+    resource: Patient
+    path: Patient.gender
+    value_map: {M: male, F: female, U: unknown}
+
+  - source: addr_line
+    resource: Patient
+    path: Patient.address[0].line[0]
+    transform: Copy as is.
+
+  - source: town
+    resource: Patient
+    path: Patient.address[0].city
+    transform: Copy as is.
+
+  - source: post_cd
+    resource: Patient
+    path: Patient.address[0].postalCode
+    transform: Keep as a string and left pad with zeros to 5 digits (2171 -> 02171). null -> leave out.
+
+  - source: mrtl
+    resource: Patient
+    path: Patient.maritalStatus.coding[0]
+    transform: system http://terminology.hl7.org/CodeSystem/v3-MaritalStatus. Empty -> leave out.
+    value_map: {M: M, S: S, D: D, W: W}
+
+  - source: dcsd
+    resource: Patient
+    path: Patient.deceasedDateTime
+    transform: Already YYYY-MM-DD. null -> leave out (or deceasedBoolean false).
+
+  - source: pg
+    ignore: paging envelope
+  - source: sz
+    ignore: paging envelope
+  - source: tot
+    ignore: paging envelope
+  - source: recs
+    ignore: paging envelope (the list of patient records)

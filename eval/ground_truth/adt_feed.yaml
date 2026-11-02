@@ -1,0 +1,151 @@
+system: adt-feed
+interface: HL7 v2.5 ADT over MLLP (port 2575) and .hl7 files in mock-systems/adt-feed/outbox
+fhir_version: R4
+
+identifier_systems:
+  hosp_mr: http://hospital.example.org/fhir/sid/hosp-mr
+  hospital_number: http://hospital.example.org/fhir/sid/hospital-number
+  adt_visit_no: http://hospital.example.org/fhir/sid/adt-visit-no
+  attending_id: http://hospital.example.org/fhir/sid/practitioner-id
+
+events:
+  A01: Admit. Create the Encounter with status in-progress. Create or update the Patient.
+  A08: Update patient information. Update the Patient and the Encounter (for example the bed). The message with the latest MSH-7 wins.
+  A03: Discharge. Set Encounter.status to finished and fill period.end.
+
+known_traps:
+  - PID-3 is not standard. It looks like HOSP^4521^MR. Component 1 is the assigning authority, component 2 is the number and component 3 is the type. A normal CX parser reads HOSP as the id.
+  - Timestamps have no timezone offset, but they are UTC. Add Z.
+  - ZEN is a local Z-segment with the encounter type and reason (SNOMED CT).
+  - Some messages have the patient name in upper case.
+  - About 2% of messages have PID-8 = U.
+  - The file drop uses carriage returns between segments, not new lines.
+  - A08 uses the ADT_A01 message structure.
+
+patient_link:
+  rule: PID-3 component 2 is the hospital number.
+  example: HOSP^4521^MR -> 4521
+  answer_key: patient_crosswalk.csv
+
+encounter_link:
+  rule: PV1-19 is the visit number. One visit number per encounter.
+  answer_key: encounter_crosswalk.csv
+
+mappings:
+  - source: MSH-3, MSH-4, MSH-5, MSH-6
+    ignore: sending and receiving application and facility
+  - source: MSH-7
+    use: order of messages (latest wins); not stored in a resource
+  - source: MSH-9
+    use: event type, see events
+  - source: MSH-10
+    use: control id, sent back in the ACK (MSA-2); not stored in a resource
+  - source: MSH-11, MSH-12
+    ignore: processing id and version
+  - source: EVN-1, EVN-2
+    ignore: same as MSH-9.2 and MSH-7
+
+  - source: PID-3.2
+    resource: Patient
+    path: Patient.identifier[hosp_mr].value
+    transform: The number as a string. The same number is the hospital number (identifier[hospital_number]).
+  - source: PID-3.1
+    resource: Patient
+    path: Patient.identifier[hosp_mr].assigner.display
+    transform: HOSP
+  - source: PID-3.3
+    resource: Patient
+    path: Patient.identifier[hosp_mr].type
+    transform: MR (system http://terminology.hl7.org/CodeSystem/v2-0203)
+  - source: PID-5.1
+    resource: Patient
+    path: Patient.name[0].family
+  - source: PID-5.2
+    resource: Patient
+    path: Patient.name[0].given[0]
+  - source: PID-5.3
+    resource: Patient
+    path: Patient.name[0].given[1]
+    transform: Middle name, often empty.
+  - source: PID-7
+    resource: Patient
+    path: Patient.birthDate
+    transform: YYYYMMDD -> YYYY-MM-DD
+  - source: PID-8
+    resource: Patient
+    path: Patient.gender
+    value_map: {M: male, F: female, U: unknown}
+  - source: PID-11.1
+    resource: Patient
+    path: Patient.address[0].line[0]
+  - source: PID-11.3
+    resource: Patient
+    path: Patient.address[0].city
+  - source: PID-11.4
+    resource: Patient
+    path: Patient.address[0].state
+  - source: PID-11.5
+    resource: Patient
+    path: Patient.address[0].postalCode
+    transform: May be empty.
+  - source: PID-11.6
+    resource: Patient
+    path: Patient.address[0].country
+  - source: PID-16
+    resource: Patient
+    path: Patient.maritalStatus.coding[0]
+    transform: system http://terminology.hl7.org/CodeSystem/v3-MaritalStatus. Empty -> leave out.
+
+  - source: PV1-2
+    resource: Encounter
+    path: Encounter.class
+    transform: system http://terminology.hl7.org/CodeSystem/v3-ActCode
+    value_map: {I: IMP, E: EMER}
+  - source: PV1-3
+    resource: Encounter
+    path: Encounter.location[0].location.display
+    transform: ward^room^bed^facility, for example MED1^012^A^HOSP. ED^^^HOSP for emergency visits.
+  - source: PV1-4
+    resource: Encounter
+    path: Encounter.priority
+    transform: system http://terminology.hl7.org/CodeSystem/v3-ActPriority
+    value_map: {E: EM, R: R}
+  - source: PV1-7
+    resource: Encounter
+    path: Encounter.participant[0]
+    transform: Type ATND. id^family^given -> Practitioner with identifier[attending_id] and name.
+  - source: PV1-10
+    resource: Encounter
+    path: Encounter.serviceType
+    transform: Local code. MED = medicine, EME = emergency.
+  - source: PV1-19
+    resource: Encounter
+    path: Encounter.identifier[adt_visit_no].value
+  - source: PV1-36
+    resource: Encounter
+    path: Encounter.hospitalization.dischargeDisposition
+    transform: Only in A03. system http://terminology.hl7.org/CodeSystem/discharge-disposition
+    value_map: {"01": home}
+  - source: PV1-44
+    resource: Encounter
+    path: Encounter.period.start
+    transform: YYYYMMDDHHMMSS (UTC, no offset) -> ISO 8601 with Z.
+  - source: PV1-45
+    resource: Encounter
+    path: Encounter.period.end
+    transform: Only in A03. Same format as PV1-44.
+
+  - source: ZEN-2
+    resource: Encounter
+    path: Encounter.type[0].coding[0]
+    transform: code^display^SCT -> system http://snomed.info/sct
+  - source: ZEN-3
+    resource: Encounter
+    path: Encounter.reasonCode[0].coding[0]
+    transform: code^display^SCT -> system http://snomed.info/sct. May be empty.
+
+derived:
+  - path: Encounter.subject
+    rule: Reference to the Patient from PID-3.2.
+  - path: Encounter.status
+    rule: A01 and A08 -> in-progress, A03 -> finished.
