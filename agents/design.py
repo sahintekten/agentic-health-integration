@@ -12,7 +12,7 @@ import yaml
 from agents import config
 from agents.llm import LLMError, complete
 
-MAX_PROMPT_CHARS = 24000
+MAX_PROMPT_CHARS = 60000
 
 MAPPING_PROMPT = """You design the mapping from one legacy hospital system to HL7 FHIR R4.
 You get a profile of the system made by another agent, and a FHIR R4 reference.
@@ -29,6 +29,23 @@ Return one JSON object with these keys:
     For anything else: one list of mapping items. "source" is the field name exactly as in the profile.
 - "unit_map": object, legacy unit -> UCUM code. Only if the system stores units.
 - "events": object, message event -> what it means for the resources. Only for message feeds.
+- "data_rules": list of record-level rules the adapter must apply. Each rule:
+    {"rule_id": one of the ids below, "trigger": when the rule fires, "action": what the adapter does,
+     "source_evidence": the inventory finding that shows the rule is needed}
+  Rule ids:
+    drop_duplicates        repeated records that are the same fact (keep one)
+    exclude_test_records   test or dummy records that are not real patients
+    unit_fallback          unit missing on a row; take it from a default somewhere else
+    unit_map               legacy unit strings that must become UCUM codes (give the FULL map in "unit_map")
+    derive_category        a FHIR category that is not stored but can be derived from another field
+    timezone_assumption    date-times without a zone; say which zone you assume and that you flag it
+    normalise_identifier   source patient ids that must be turned into the shared hospital number
+    restore_leading_zeros  codes that lost their leading zeros
+    trim_whitespace        values with extra spaces
+    date_format            dates in a non-standard or wrongly documented format
+    latest_event_wins      several messages about the same thing; the latest one decides
+    other                  anything else (explain it)
+  Only add a rule when the inventory findings give evidence for it.
 
 A mapping item is ONE of these:
   {"source": X, "resource": "Patient" | "Observation" | "Encounter" | "Practitioner",
@@ -38,7 +55,8 @@ A mapping item is ONE of these:
      (paging fields, message control data, audit columns, unused columns)
   {"source": X, "lookup": purpose}  for columns of a lookup table that are only used to fill other elements
 A source may have more than one mapping item when it fills more than one FHIR element.
-Every field in the profile must appear at least once. Do not invent fields."""
+Every field in the profile must appear at least once. Do not invent fields.
+Follow the patient ID policy you are given."""
 
 ID_PROMPT = """You write short technical notes for a hospital integration team. Plain English, short sentences.
 Write a markdown note titled "Patient ID strategy: <system name>" with these sections:
@@ -56,7 +74,7 @@ def _profile_view(profile, inventory, samples=2):
                 entry[k] = inv[k]
         entry["samples"] = inv.get("samples", [])[:samples]
         if inv.get("value_counts"):
-            entry["values"] = list(inv["value_counts"])[:10]
+            entry["values"] = list(inv["value_counts"])
         fields.append(entry)
     view = {
         "system": profile["name"],
@@ -73,7 +91,32 @@ def _profile_view(profile, inventory, samples=2):
         view["tables"] = {
             t: {"rows": v["row_count"], "duplicates": v["duplicates"]} for t, v in inventory["tables"].items()
         }
+    view["inventory_findings"] = inventory_findings(inventory)
     return view
+
+
+def inventory_findings(inventory):
+    """Facts from the deterministic inventory that point to data rules."""
+    findings = {"null_rates": {}, "extra_spaces": {}, "suspicious_values": {}, "formats": {}, "duplicates": {}}
+    for name, f in inventory["fields"].items():
+        if f.get("null_rate"):
+            findings["null_rates"][name] = f["null_rate"]
+        if f.get("values_with_extra_spaces"):
+            findings["extra_spaces"][name] = f["values_with_extra_spaces"]
+        if f.get("suspicious_values"):
+            findings["suspicious_values"][name] = f["suspicious_values"]
+        if f.get("formats"):
+            findings["formats"][name] = f["formats"]
+        if "digits_with_varying_length" in f.get("formats", []):
+            findings.setdefault("varying_digit_lengths", []).append(name)
+    for table, info in (inventory.get("tables") or {}).items():
+        if info.get("duplicates"):
+            findings["duplicates"][table] = info["duplicates"]
+    if inventory.get("doc_vs_data"):
+        findings["doc_vs_data"] = inventory["doc_vs_data"]
+    if inventory.get("message_types"):
+        findings["message_types"] = inventory["message_types"]
+    return {k: v for k, v in findings.items() if v}
 
 
 def _fit(view_fn):
@@ -207,11 +250,15 @@ def run(system):
     profile = json.loads(profile_path.read_text())
     inventory = json.loads((out / "inventory.json").read_text())
     reference = (config.FHIR_REF / "r4_reference.md").read_text()
+    id_policy = (config.FHIR_REF / "id_policy.md").read_text()
 
     profile_text = _fit(lambda n: _profile_view(profile, inventory, n))
     messages = [
         {"role": "system", "content": MAPPING_PROMPT},
-        {"role": "user", "content": f"FHIR R4 reference:\n{reference}\n\nSystem profile:\n{profile_text}"},
+        {
+            "role": "user",
+            "content": f"FHIR R4 reference:\n{reference}\n\n{id_policy}\n\nSystem profile:\n{profile_text}",
+        },
     ]
     reply = complete(messages, model_tier="strong", json_mode=True, purpose=f"design mapping {system}")
     try:
@@ -232,6 +279,7 @@ def run(system):
     )
 
     id_facts = {
+        "id_policy": id_policy,
         "system": profile["name"],
         "patient_identifier": profile.get("patient_identifier"),
         "patient_link": mapping.get("patient_link"),
@@ -266,6 +314,8 @@ def summarise(mapping, system):
     lines = [f"System {system}: mapping for {mapping.get('system')}"]
     lines += [f"  {r}: {n} mapped fields" for r, n in sorted(counts.items())]
     lines.append(f"  ignored or lookup: {ignored}")
+    for rule in mapping.get("data_rules", []):
+        lines.append(f"  rule: {rule.get('rule_id')}: {str(rule.get('action', ''))[:90]}")
     if mapping.get("unmapped_fields"):
         lines.append(f"  not mapped by the model: {', '.join(mapping['unmapped_fields'])}")
     for trap in mapping.get("known_traps", [])[:8]:

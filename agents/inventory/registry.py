@@ -115,6 +115,7 @@ def build(base_url, sample_size=20):
         "source": base_url,
         "openapi": {"title": (spec.get("info") or {}).get("title"), "version": (spec.get("info") or {}).get("version")},
         "endpoints": endpoints,
+        "list_endpoint": {"path": "/patients", "page_param": "pg", "size_param": "sz", "list_key": list_key},
         "documented_paths": doc_paths,
         "record_count": len(records),
         "fields": fields,

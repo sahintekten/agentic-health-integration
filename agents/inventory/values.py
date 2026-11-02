@@ -106,8 +106,8 @@ def profile(values, max_samples=5):
     numbers = [n for n in (_as_number(str(v).strip()) for v in present) if n is not None]
     if numbers and len(numbers) == len(present):
         result["min"], result["max"] = min(numbers), max(numbers)
-    if 0 < len(counts) <= 12 and len(present) > len(counts):
-        result["value_counts"] = dict(counts.most_common(12))
+    if 0 < len(counts) <= 30 and len(present) > len(counts):
+        result["value_counts"] = dict(counts.most_common(30))
     padded = sum(1 for v in present if isinstance(v, str) and (v != v.strip() or "  " in v))
     if padded:
         result["values_with_extra_spaces"] = padded

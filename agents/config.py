@@ -28,8 +28,9 @@ def lab_db_settings():
 
 
 # Gemini model ids (free tier, checked on the pricing page in November 2026).
-# A comma list means: try the next model when one is overloaded (HTTP 503).
-GEMINI_MODEL_STRONG = os.environ.get("GEMINI_MODEL_STRONG", "gemini-3.8-flash,gemini-3.6-flash")
+# A comma list means: try the next model when one is overloaded (HTTP 503),
+# for example "gemini-3.8-flash,gemini-3.6-flash".
+GEMINI_MODEL_STRONG = os.environ.get("GEMINI_MODEL_STRONG", "gemini-3.6-flash")
 GEMINI_MODEL_FAST = os.environ.get("GEMINI_MODEL_FAST", "gemini-3.5-flash-lite")
 
 SYSTEMS = {"a": "patient-registry-api", "b": "lab-db", "c": "adt-feed"}
@@ -37,6 +38,10 @@ SYSTEMS = {"a": "patient-registry-api", "b": "lab-db", "c": "adt-feed"}
 
 def workspace():
     return Path(os.environ.get("AGENTS_WORKSPACE", ROOT / "workspace"))
+
+
+def generated_dir():
+    return Path(os.environ.get("AGENTS_GENERATED", ROOT / "generated"))
 
 
 def system_dir(system):
