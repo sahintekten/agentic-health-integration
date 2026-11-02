@@ -22,7 +22,7 @@ import httpx
 import psycopg
 import yaml
 
-from agents import config, generate
+from agents import config, csharp_layout, generate
 from agents.inventory.values import SUSPICIOUS
 from agents.llm import LLMError, complete
 
@@ -295,6 +295,9 @@ def pii_values(system, profile):
     else:
         rows = _hl7_records()
     for row in rows:
+        # test and dummy records are not real patients
+        if any(isinstance(v, str) and SUSPICIOUS.search(v) for v in row.values()):
+            continue
         for key in pii:
             v = row.get(key)
             if v in (None, ""):
@@ -465,6 +468,8 @@ def repair(system, out, stage, problems, round_no):
                 continue
         (out / name).write_text(generate._strip_code(text) + "\n")
         changed.append(name)
+    if changed:
+        csharp_layout.tidy(out, changed)
     return {"changed": changed, "refused": refused}
 
 
