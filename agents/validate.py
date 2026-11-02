@@ -22,13 +22,15 @@ import httpx
 import psycopg
 import yaml
 
-from agents import config, csharp_layout, generate
+from agents import config, csharp_layout, generate, progress
+from agents.inventory.csvfiles import read_export
 from agents.inventory.values import SUSPICIOUS
 from agents.llm import LLMError, complete
 
 MAX_ROUNDS = 5
-PORTS = {"a": 9001, "b": 9002, "c": 9003}
-MLLP_TEST_PORT = 9013
+# local ports for validation runs (9001-9004 belong to the adapter containers)
+PORTS = {"a": 9101, "b": 9102, "c": 9103, "d": 9104}
+MLLP_TEST_PORT = 9113
 EDITABLE = {"src/Mapper.cs", "tests/MappingTests.cs", "tests/DataRulesTests.cs"}
 TEST_FILES = ["tests/MappingTests.cs", "tests/DataRulesTests.cs"]
 ERROR_LINE = re.compile(r"(?P<file>[^\s(]+\.cs)\((?P<line>\d+),\d+\): error (?P<code>CS\d+): (?P<msg>.*?)(?: \[|$)")
@@ -78,7 +80,7 @@ def check_build(out):
 
 
 def check_tests(out, work):
-    trx_dir = work / "validate" / "trx"
+    trx_dir = work / "validate_trx"
     for old in trx_dir.glob("*.trx"):
         old.unlink()
     _run(
@@ -122,7 +124,7 @@ class RunningAdapter:
 
     def __init__(self, system, out, work):
         self.url = f"http://127.0.0.1:{PORTS[system]}"
-        self.log_path = work / "validate" / "adapter.log"
+        self.log_path = work / "adapter.log"
         env = _env()
         env.update(ASPNETCORE_URLS=self.url, MLLP_PORT=str(MLLP_TEST_PORT), CACHE_SECONDS="600")
         self.log = self.log_path.open("w")
@@ -161,7 +163,7 @@ class RunningAdapter:
 
 def check_contract(adapter, work, openapi, resources):
     problems, files = [], []
-    saved = work / "validate" / "responses"
+    saved = work / "responses"
     saved.mkdir(parents=True, exist_ok=True)
     for old in saved.glob("*.json"):
         old.unlink()
@@ -292,6 +294,8 @@ def pii_values(system, profile):
     elif system == "b":
         tables = _lab_tables()
         rows = [{f"lb_pt.{k}": v for k, v in r.items()} for r in tables["lb_pt"]]
+    elif system == "d":
+        rows = read_export(config.APPT_EXPORT)[0]
     else:
         rows = _hl7_records()
     for row in rows:
@@ -372,6 +376,9 @@ def expected_counts(system, mapping, inventory):
             per.setdefault(str(r["pt_ref"]), {"Observation": 0})["Observation"] += 1
         return {"Patient": len(patients), "Observation": len(rs)}, per
 
+    if system == "d":
+        return _expected_from_rows(read_export(config.APPT_EXPORT)[0], mapping)
+
     records = _hl7_records()
     pid_field = "PID-3.2"
     for _, item in _mapping_items(mapping):
@@ -382,6 +389,24 @@ def expected_counts(system, mapping, inventory):
     visits = {}
     for r in records:
         visits.setdefault(r.get("PV1-19"), _hospital_number(r.get(pid_field)))
+    per = {}
+    for pid in visits.values():
+        per.setdefault(pid, {"Encounter": 0})["Encounter"] += 1
+    return {"Patient": len(per), "Encounter": len(visits)}, per
+
+
+def _expected_from_rows(rows, mapping):
+    """Flat-file source: one Patient per hospital number, one Encounter per encounter id."""
+    pid_field = enc_field = None
+    for _, item in _mapping_items(mapping):
+        path = str(item.get("path", ""))
+        if item.get("resource") == "Patient" and "identifier" in path and not pid_field:
+            pid_field = item["source"]
+        if item.get("resource") == "Encounter" and "identifier" in path and not enc_field:
+            enc_field = item["source"]
+    visits = {}
+    for r in rows:
+        visits.setdefault(r.get(enc_field), _hospital_number(r.get(pid_field)))
     per = {}
     for pid in visits.values():
         per.setdefault(pid, {"Encounter": 0})["Encounter"] += 1
@@ -514,29 +539,32 @@ def _markdown(system, n, result):
     return "\n".join(lines) + "\n"
 
 
-def run(system):
+def run(system, out=None, repair=True, report_name="validate"):
+    """Check the adapter in `out` (default generated/<system>). Without repair it runs one round."""
     work = config.system_dir(system)
-    out = config.generated_dir() / system
-    if not (out / "src" / "Mapper.cs").exists():
+    out = out or config.generated_dir() / system
+    if repair and not (out / "src" / "Mapper.cs").exists():
         raise SystemExit(f"{out} has no generated code. Run the generate step first.")
-    report_dir = work / "validate"
+    report_dir = work / report_name
     report_dir.mkdir(parents=True, exist_ok=True)
     mapping = yaml.safe_load((work / "mapping.yaml").read_text())
     openapi = yaml.safe_load((work / "openapi.yaml").read_text())
     inventory = json.loads((work / "inventory.json").read_text())
     profile = json.loads((work / "profile.json").read_text())
-    resources = json.loads((work / "generate.json").read_text())["resources"]
+    meta = work / "generate.json"
+    resources = json.loads(meta.read_text())["resources"] if meta.exists() else ["Patient"]
     _run(["dotnet", "build", "tools/FhirCheck", "-nologo", "-v", "q"], config.generated_dir())
 
     rounds = []
-    for n in range(1, MAX_ROUNDS + 1):
+    rounds_allowed = MAX_ROUNDS if repair else 1
+    for n in range(1, rounds_allowed + 1):
         result = {"round": n, "build": check_build(out)}
         if result["build"]["ok"]:
             result["tests"] = check_tests(out, work)
-            adapter = RunningAdapter(system, out, work)
+            adapter = RunningAdapter(system, out, report_dir)
             try:
                 if adapter.wait():
-                    result["contract"] = check_contract(adapter, work, openapi, resources)
+                    result["contract"] = check_contract(adapter, report_dir, openapi, resources)
                     result["reconciliation"] = check_reconciliation(system, adapter, mapping, inventory, resources)
                 else:
                     result["contract"] = {"ok": False, "problems": ["adapter did not start or /health failed"]}
@@ -547,12 +575,14 @@ def run(system):
             result["phi"] = check_phi(system, out, profile, log_text)
         stage, problems = _first_problems(result)
         result["passed"] = stage is None
-        if stage and n < MAX_ROUNDS:
+        if stage and repair and n < MAX_ROUNDS:
             result["repair"] = {"stage": stage, **repair(system, out, stage, problems, n)}
         (report_dir / f"round_{n}.json").write_text(json.dumps(result, indent=1, default=str))
         (report_dir / f"round_{n}.md").write_text(_markdown(system, n, result))
         rounds.append(result)
-        print(f"round {n}:", "; ".join(line[2:] for line in _markdown(system, n, result).splitlines()[2:8] if line))
+        line = "; ".join(item[2:] for item in _markdown(system, n, result).splitlines()[2:8] if item)
+        print(f"round {n}:", line)
+        progress.emit(system, "validate", f"round {n}", line)
         if result["passed"]:
             break
 

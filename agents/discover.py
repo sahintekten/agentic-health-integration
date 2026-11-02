@@ -8,7 +8,7 @@ import json
 from datetime import datetime, timezone
 
 from agents import config
-from agents.inventory import adt, labdb, registry
+from agents.inventory import adt, csvfiles, labdb, registry
 from agents.llm import LLMError, complete
 
 MAX_PROMPT_CHARS = 24000  # keeps prompts well under 8k tokens
@@ -34,6 +34,8 @@ FORMAT_TOKENS = {
     "date_yyyymmdd": "YYYYMMDD",
     "datetime_yyyymmddhhmmss": "YYYYMMDDHHMMSS",
     "date_iso": "YYYY-MM-DD",
+    "date_dd.mm.yyyy": "DD.MM.YYYY",
+    "datetime_dd.mm.yyyy_hh:mm": "DD.MM.YYYY",
     "epoch_seconds": "EPOCH",
 }
 
@@ -45,6 +47,8 @@ def build_inventory(system):
         return labdb.build(config.lab_db_settings())
     if system == "c":
         return adt.build(config.ADT_OUTBOX, config.ADT_HOST, config.ADT_PORT)
+    if system == "d":
+        return csvfiles.build(config.APPT_EXPORT)
     raise ValueError(f"unknown system {system!r}")
 
 

@@ -60,6 +60,10 @@ def detect_formats(values):
             found.append("date_mm/dd/yyyy")
         else:
             found.append("date_nn/nn/yyyy_ambiguous")
+    if all(len(s) == 10 and _valid_date(s, "%d.%m.%Y") for s in strs):
+        found.append("date_dd.mm.yyyy")
+    if all(len(s) == 16 and _valid_date(s, "%d.%m.%Y %H:%M") for s in strs):
+        found.append("datetime_dd.mm.yyyy_hh:mm")
     if all(re.fullmatch(r"\d{4}-\d{2}-\d{2}", s) for s in strs):
         found.append("date_iso")
     if all(re.fullmatch(r"\d{4}-\d{2}-\d{2}T[\d:.]+(Z|[+-]\d{2}:?\d{2})?", s) for s in strs):

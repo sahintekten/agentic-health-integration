@@ -84,7 +84,17 @@ def _profile_view(profile, inventory, samples=2):
         "issues": profile.get("issues", []) + profile.get("inventory_findings", []),
         "fields": fields,
     }
-    for key in ("message_types", "join_candidates", "endpoints"):
+    for key in (
+        "message_types",
+        "join_candidates",
+        "endpoints",
+        "encoding",
+        "delimiter",
+        "non_data_lines",
+        "repeated_keys",
+        "empty_trailing_column",
+        "files",
+    ):
         if key in inventory:
             view[key] = inventory[key]
     if "tables" in inventory:
@@ -116,6 +126,8 @@ def inventory_findings(inventory):
         findings["doc_vs_data"] = inventory["doc_vs_data"]
     if inventory.get("message_types"):
         findings["message_types"] = inventory["message_types"]
+    if inventory.get("repeated_keys"):
+        findings["repeated_keys_across_files"] = inventory["repeated_keys"]
     return {k: v for k, v in findings.items() if v}
 
 

@@ -11,6 +11,7 @@ load_dotenv(ROOT / ".env", override=False)
 CACHE_DIR = ROOT / ".cache" / "llm"
 FHIR_REF = Path(__file__).parent / "fhir_ref"
 ADT_OUTBOX = Path(os.environ.get("ADT_OUTBOX", ROOT / "mock-systems" / "adt-feed" / "outbox"))
+APPT_EXPORT = Path(os.environ.get("EXPORT_DIR", ROOT / "mock-systems" / "appointments-export" / "out"))
 
 REGISTRY_URL = os.environ.get("REGISTRY_URL", "http://localhost:8001")
 ADT_HOST = os.environ.get("ADT_HOST", "localhost")
@@ -33,7 +34,7 @@ def lab_db_settings():
 GEMINI_MODEL_STRONG = os.environ.get("GEMINI_MODEL_STRONG", "gemini-3.6-flash")
 GEMINI_MODEL_FAST = os.environ.get("GEMINI_MODEL_FAST", "gemini-3.5-flash-lite")
 
-SYSTEMS = {"a": "patient-registry-api", "b": "lab-db", "c": "adt-feed"}
+SYSTEMS = {"a": "patient-registry-api", "b": "lab-db", "c": "adt-feed", "d": "appointments-export"}
 
 
 def workspace():

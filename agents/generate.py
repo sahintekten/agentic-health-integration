@@ -71,6 +71,8 @@ def _profile(system):
             if f.get("location") == "response envelope":
                 continue
             table, key = "patients", name
+        elif kind == "csv-files":
+            table, key = "rows", name
         else:
             table, key = "messages", name
         info = {"formats": f.get("formats"), "shapes": f.get("shapes", [])[:2], "null_rate": f.get("null_rate")}
@@ -86,6 +88,13 @@ def _profile(system):
             'The key "_file" holds the file name.'
         )
         reader, extra = "Hl7FileReader", {"mllp": True}
+    elif kind == "csv-files":
+        note = (
+            "One record per data row of every export file. Keys are the header names exactly. "
+            '"_file" holds the file name; files are read oldest first (the name has the ISO week). '
+            "Footer lines are skipped by the reader. Values are raw text; empty values are null."
+        )
+        reader, extra = "CsvFileReader", {"encoding": inventory["encoding"], "delimiter": inventory["delimiter"]}
     elif kind == "postgresql":
         note = "One record per row. Keys are lower case column names. All values are raw text; null stays null."
         reader, extra = "LabDbReader", {"tables": list(inventory["tables"])}
@@ -116,6 +125,7 @@ def _write_template(src, dest, subs):
 
 def write_templates(system, profile, mapping):
     out = config.generated_dir() / system
+    out.mkdir(parents=True, exist_ok=True)
     for name in ("global.json", "Directory.Build.props", ".editorconfig"):
         shutil.copy(TEMPLATES / name, config.generated_dir() / name)
     tool = config.generated_dir() / "tools" / "FhirCheck"
@@ -136,6 +146,8 @@ def write_templates(system, profile, mapping):
         "TABLE": "patients",
         "EXTRA_ASSERTS": "".join(f"        Assert.NotEmpty(data.{r}s);\n" for r in resources if r != "Patient"),
     }
+    if profile["reader"] == "CsvFileReader":
+        subs.update({"TABLE": "rows", "ENCODING": profile["encoding"], "DELIMITER": profile["delimiter"]})
     if "endpoint" in profile:
         ep = profile["endpoint"]
         subs.update({"LIST_PATH": ep["path"], "PAGE_PARAM": ep["page_param"], "SIZE_PARAM": ep["size_param"]})
@@ -149,7 +161,7 @@ def write_templates(system, profile, mapping):
     files += ["tests/Adapter.Tests.csproj", "tests/IntegrationTests.cs", "Dockerfile"]
     for f in files:
         _write_template(f, out / f, subs)
-    for name in ("global.json", "Directory.Build.props"):
+    for name in ("global.json", "Directory.Build.props", ".dockerignore"):
         shutil.copy(TEMPLATES / name, out / name)
     return files + ["global.json", "Directory.Build.props"], resources
 
