@@ -1,7 +1,7 @@
 """LLM layer. The agents only use complete().
 
-The provider comes from LLM_PROVIDER in .env: github_models (default),
-claude_code, anthropic, azure_openai, or fake (offline, for tests).
+The provider comes from LLM_PROVIDER in .env: gemini (default), claude_code,
+anthropic, azure_openai, fake (offline, for tests) or github_models (retired).
 """
 
 import os
@@ -14,7 +14,11 @@ __all__ = ["complete", "get_provider", "LLMError", "QuotaError", "strip_fences"]
 
 
 def get_provider(name=None):
-    name = (name or os.environ.get("LLM_PROVIDER") or "github_models").strip()
+    name = (name or os.environ.get("LLM_PROVIDER") or "gemini").strip()
+    if name == "gemini":
+        from agents.llm.gemini import Gemini
+
+        return Gemini()
     if name == "github_models":
         from agents.llm.github_models import GitHubModels
 
@@ -57,7 +61,7 @@ def complete(messages, model_tier="strong", json_mode=False, purpose=""):
     cache.put(key, {"text": text, "prompt_tokens": result.prompt_tokens, "completion_tokens": result.completion_tokens})
     runlog.log(
         provider=provider.name,
-        model=model,
+        model=result.model or model,
         tier=model_tier,
         purpose=purpose,
         cached=False,
