@@ -1,3 +1,4 @@
 -r tests/requirements.txt
 -r agents/requirements.txt
+-r dashboard/requirements.txt
 pre-commit==4.0.1
