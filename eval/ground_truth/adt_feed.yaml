@@ -157,3 +157,7 @@ data_rules:
     note: HL7 timestamps have no offset; they are UTC in this feed.
   - rule_id: latest_event_wins
     note: A01, A08 and A03 for one visit; the latest message decides the Encounter state.
+  - rule_id: trim_whitespace
+    note: ZEN-3.2 (reason display) has extra spaces in some messages. Added in answer key v2.
+  - rule_id: drop_duplicates
+    note: many messages describe the same patient; keep one Patient per hospital number. Added in answer key v2.

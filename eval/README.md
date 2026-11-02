@@ -18,3 +18,13 @@ Each YAML also has a `known_traps` list. These are the problems we put in the sy
 The CSV files are made by `data/scripts/transform_all.py`, so they always match the seed data. The YAML files are written by hand.
 
 The identifier system URLs (`http://hospital.example.org/...`) are our own choice. When scoring, compare values and types, not the exact URL.
+
+## Answer key history
+
+- **v1 (phase 1):** field mappings and crosswalks for systems A, B and C.
+- **v1.1 (phase 3):** added the expected `data_rules` for each system.
+- **v2 (phase 4):** added two rules for system C after we reviewed the phase 3 output:
+  - `trim_whitespace`: the inventory showed extra spaces in `ZEN-3.2`, so the rule is needed. We missed it when we wrote v1.1.
+  - `drop_duplicates`: every ADT message repeats the patient, so the adapter must keep one Patient per hospital number. This is a real rule, not just a detail of the code.
+
+  We only add a rule when the source data proves it is needed. We do not add rules just because an agent suggested them.
