@@ -31,10 +31,10 @@ jobs:
           python-version: "3.12"
       - name: start mock systems
         run: docker compose up -d --build --wait
-      - name: smoke tests
+      - name: smoke tests and eval guard
         run: |
-          pip install -r tests/requirements.txt
-          pytest -q tests/smoke
+          pip install -r tests/requirements.txt -r agents/requirements.txt
+          pytest -q tests
       - name: logs on failure
         if: failure()
         run: docker compose logs
