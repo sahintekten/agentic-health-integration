@@ -1,0 +1,19 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300171;P/0020571-J;Jae Amado BARTELL;17.06.1997;m;30.09.2026 05:34;15;OPD-GEN;Encounter for symptom (procedure);CX;2026-09-21;
+AP300172;P/0053911-W;Luz Guadalupe OROZCO;21.08.1973;w;30.09.2026 06:34;47;OPD-GEN;Ophthalmic examination and evaluation (procedure);DN;2026-08-26;
+AP300173;P/0001849-J;Elisha HEGMANN;22.09.1966;m;30.09.2026 16:40;218;OPD-GEN;Encounter for problem (procedure);DN;2026-09-21;
+AP300174;P/0072680-A;Moshe GULGOWSKI;24.09.2016;m;03.10.2026 08:30;15;GP-WELL;Well child visit (procedure);DN;2026-09-16;
+AP300175;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;03.10.2026 16:56;23;OPD-GEN;Outpatient procedure (procedure);DN;2026-09-11;
+AP300176;P/0001849-J;Elisha HEGMANN;22.09.1966;m;03.10.2026 20:18;182;OPD-GEN;Encounter for problem (procedure);DN;2026-08-31;
+AP300177;P/0003300-L;Candelaria Roxann FRAMI;15.02.1965;w;05.10.2026 02:28;53;GP-WELL;General examination of patient (procedure);BK;2026-09-21;
+AP300178;P/0014506-Q;Loretta ROSENBAUM;07.10.1996;w;05.10.2026 21:01;16;OPD-SPEC;Patient encounter procedure (procedure);BK;2026-09-22;
+AP300179;P/0091062-F;Tamica Cori WILLIAMSON;26.05.1953;w;06.10.2026 01:12;30;GP-WELL;General examination of patient (procedure);BK;2026-08-29;
+AP300180;P/0035692-T;Nia NADER;22.02.2000;w;06.10.2026 12:23;15;OPD-GEN;Prenatal initial visit (regime/therapy);BK;2026-09-03;
+AP300181;P/0001849-J;Elisha HEGMANN;22.09.1966;m;06.10.2026 23:20;209;OPD-GEN;Encounter for problem (procedure);BK;2026-09-27;
+AP300182;P/0047333-W;Colby AUFDERHAR;13.04.1932;;07.10.2026 21:18;15;OPD-GEN;Encounter for check up (procedure);BK;2026-09-15;
+AP300183;P/0057481-E;John Robbi GREEN;20.12.1990;w;08.10.2026 16:35;33;OPD-SPEC;Consultation for treatment (procedure);BK;2026-09-13;
+AP300184;P/0044300-C;Cedric Federico ANKUNDING;19.06.1917;m;08.10.2026 17:47;80;OPD-GEN;Encounter for problem (procedure);BK;2026-09-08;
+AP300185;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;09.10.2026 00:21;15;OPD-GEN;Prenatal visit (regime/therapy);BK;2026-09-03;
+AP300186;P/0001849-J;Elisha HEGMANN;22.09.1966;m;10.10.2026 02:49;217;OPD-GEN;Encounter for problem (procedure);BK;2026-08-31;
+AP300187;P/0096822-P;Charissa Alanna SCHOWALTER;28.01.2001;w;11.10.2026 19:46;15;OPD-GEN;Prenatal visit (regime/therapy);BK;2026-09-11;
+--- END OF EXPORT 17 ROWS ---

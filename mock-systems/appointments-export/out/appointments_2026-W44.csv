@@ -1,0 +1,10 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300206;P/0026128-A;Leroy Willie OLSON;18.10.2016;m;27.10.2026 02:43;15;GP-WELL;Well child visit (procedure);DN;2026-10-07;
+AP300207;P/0053911-W;Luz Guadalupe OROZCO;21.08.1973;w;27.10.2026 04:31;46;GP-WELL;General examination of patient (procedure);DN;2026-10-02;
+AP300208;P/0098553-V;Tabatha Kesha MURPHY;20.02.1945;w;27.10.2026 11:59;15;OPD-GEN;Follow-up encounter (procedure);NS;2026-10-05;
+AP300209;P/0003824-G;Thuy WINDLER;22.05.1991;w;28.10.2026 04:19;34;OPD-GEN;Encounter for check up (procedure);DN;2026-10-06;
+AP300210;P/0001849-J;Elisha HEGMANN;22.09.1966;m;28.10.2026 21:07;178;OPD-GEN;Encounter for problem (procedure);DN;2026-09-25;
+AP300211;P/0001849-J;Elisha HEGMANN;22.09.1966;m;29.10.2026 00:05;15;OPD-GEN;Encounter for problem (procedure);DN;2026-09-23;
+AP300212;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;29.10.2026 17:19;31;OPD-GEN;Outpatient procedure (procedure);DN;2026-10-05;
+AP300213;P/0018477-I;Gregorio Emilio CALVILLO;09.09.2011;m;30.10.2026 19:14;15;OPD-GEN;Encounter for check up (procedure);DN;2026-10-12;
+--- END OF EXPORT 8 ROWS ---

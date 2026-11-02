@@ -1,0 +1,20 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300030;P/0051796-A;Arnold Andrea HARTMANN;23.06.1971;m;23.06.2026 00:02;41;OPD-GEN;Encounter for check up (procedure);DN;2026-05-15;
+AP300031;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;24.06.2026 21:18;48;OPD-SPEC;Encounter for check up (procedure);DN;2026-06-16;
+AP300032;P/0071924-D;Keira GREENFELDER;28.07.1988;w;25.06.2026 09:36;15;OPD-SPEC;Consultation for treatment (procedure);DN;2026-05-24;
+AP300033;P/0001849-J;Elisha HEGMANN;22.09.1966;m;25.06.2026 20:29;160;OPD-GEN;Encounter for problem (procedure);DN;2026-05-25;
+AP300034;P/0001849-J;Elisha HEGMANN;22.09.1966;m;25.06.2026 23:09;15;OPD-GEN;Encounter for problem (procedure);DN;2026-05-30;
+AP300035;P/0095246-D;Mariel EMARD;26.02.1955;w;27.06.2026 13:58;15;OPD-GEN;Follow-up encounter (procedure);NS;2026-05-25;
+AP300036;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;27.06.2026 14:35;28;OPD-GEN;Outpatient procedure (procedure);DN;2026-05-20;
+AP300037;P/0026913-D;Erick Josiah ROSENBAUM;06.07.2019;m;27.06.2026 19:02;15;GP-WELL;Well child visit (procedure);DN;2026-06-09;
+AP300038;P/0097464-N;Serita LEFFLER;18.06.1947;w;28.06.2026 18:13;109;OPD-GEN;Follow-up encounter (procedure);DN;2026-06-11;
+AP300039;P/0001849-J;Elisha HEGMANN;22.09.1966;m;28.06.2026 23:09;230;OPD-GEN;Encounter for problem (procedure);DN;2026-06-14;
+AP300040;P/0035692-T;Nia NADER;22.02.2000;w;30.06.2026 13:28;15;OPD-GEN;Postnatal visit (regime/therapy);BK;2026-06-19;
+AP300041;P/0044486-E;Barbar BLOCK;24.03.1959;w;30.06.2026 16:32;45;GP-WELL;General examination of patient (procedure);BK;2026-06-06;
+AP300042;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;01.07.2026 21:18;15;OPD-SPEC;Encounter for check up (procedure);BK;2026-06-21;
+AP300043;P/0001849-J;Elisha HEGMANN;22.09.1966;m;02.07.2026 02:59;132;OPD-GEN;Encounter for problem (procedure);BK;2026-05-29;
+AP300044;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;03.07.2026 00:21;15;OPD-GEN;Prenatal visit (regime/therapy);BK;2026-06-18;
+AP300045;P/0028720-Q;Franklyn Otha LOWE;07.03.1997;m;03.07.2026 05:01;50;GP-WELL;General examination of patient (procedure);BK;2026-05-24;
+AP300046;P/0001849-J;Elisha HEGMANN;22.09.1966;m;05.07.2026 05:11;128;OPD-GEN;Encounter for problem (procedure);BK;2026-06-27;
+AP300047;P/0024274-J;Barb Nohemi WEBER;23.05.1996;w;05.07.2026 08:29;15;OPD-SPEC;Consultation for treatment (procedure);BK;2026-05-28;
+--- END OF EXPORT 18 ROWS ---

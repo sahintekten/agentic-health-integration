@@ -1,0 +1,21 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300152;P/0025280-D;Rodrick HAHN;19.03.1951;m;14.09.2026 02:04;15;GP-WELL;Death Certification;DN;2026-09-05;
+AP300153;P/0065754-U;Monty LOCKMAN;27.07.2009;m;14.09.2026 14:27;15;GP-WELL;Well child visit (procedure);DN;2026-08-23;
+AP300154;P/0001849-J;Elisha HEGMANN;22.09.1966;m;15.09.2026 03:26;184;OPD-GEN;Encounter for problem (procedure);DN;2026-09-02;
+AP300155;P/0097464-N;Serita LEFFLER;18.06.1947;w;16.09.2026 13:30;32;OPD-SPEC;Encounter for check up (procedure);DN;2026-09-08;
+AP300156;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;16.09.2026 21:18;15;OPD-GEN;Encounter for check up (procedure);DN;2026-08-12;
+AP300157;P/0014642-O;Maud Pauline BREKKE;19.12.2009;w;17.09.2026 12:13;38;OPD-GEN;Outpatient procedure (procedure);DN;2026-09-02;
+AP300158;P/0001849-J;Elisha HEGMANN;22.09.1966;m;18.09.2026 06:30;184;OPD-GEN;Encounter for problem (procedure);CX;2026-08-20;
+AP300159;P/0088988-B;Mitchell Wilmer FRAMI;07.06.1969;m;19.09.2026 18:00;51;GP-WELL;General examination of patient (procedure);DN;2026-08-15;
+AP300160;P/0082702-R;Mac Micah MOORE;12.07.2025;m;19.09.2026 20:47;15;GP-WELL;Well child visit (procedure);CX;2026-09-04;
+AP300161;P/0037980-H;Britteny Gabriele DIETRICH;07.11.2003;w;20.09.2026 05:08;15;OPD-SPEC;Consultation for treatment (procedure);DN;2026-08-19;
+AP300162;P/0001849-J;Elisha HEGMANN;22.09.1966;m;21.09.2026 09:34;124;OPD-GEN;Encounter for problem (procedure);BK;2026-08-31;
+AP300163;P/0034010-Q;Myra DICKINSON;15.09.1966;w;22.09.2026 04:51;27;OPD-GEN;Encounter for check up (procedure);BK;2026-08-31;
+AP300164;P/0001849-J;Elisha HEGMANN;22.09.1966;m;22.09.2026 21:43;53;OPD-GEN;Encounter for check up (procedure);BK;2026-08-13;
+AP300165;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;23.09.2026 21:18;59;OPD-SPEC;Encounter for check up (procedure);BK;2026-08-23;
+AP300166;P/0001849-J;Elisha HEGMANN;22.09.1966;m;24.09.2026 11:38;124;OPD-GEN;Encounter for problem (procedure);BK;2026-09-03;
+AP300167;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;25.09.2026 00:21;15;OPD-GEN;Prenatal visit (regime/therapy);BK;2026-08-24;
+AP300168;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;25.09.2026 00:21;15;OPD-GEN;Asthma follow-up (regime/therapy);BK;2026-08-25;
+AP300169;P/0001849-J;Elisha HEGMANN;22.09.1966;m;27.09.2026 13:42;178;OPD-GEN;Encounter for problem (procedure);BK;2026-09-06;
+AP300170;P/0001849-J;Elisha HEGMANN;22.09.1966;m;27.09.2026 16:40;15;OPD-GEN;Encounter for problem (procedure);BK;2026-08-19;
+--- END OF EXPORT 19 ROWS ---

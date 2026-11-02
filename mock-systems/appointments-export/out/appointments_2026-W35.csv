@@ -1,0 +1,24 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300123;P/0001849-J;Elisha HEGMANN;22.09.1966;m;24.08.2026 04:17;226;OPD-GEN;Encounter for problem (procedure);DN;2026-07-27;
+AP300124;P/0062260-W;Stanford John BLICK;04.06.2001;m;24.08.2026 12:23;61;OPD-GEN;Encounter for check up (procedure);DN;2026-07-19;
+AP300125;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;24.08.2026 12:31;20;OPD-GEN;Encounter for check up (procedure);NS;2026-08-14;
+AP300126;P/0057013-T;Richard MILLER;02.04.1997;w;26.08.2026 09:04;35;OPD-GEN;Encounter for check up (procedure);DN;2026-08-06;
+AP300127;P/0014642-O;Maud Pauline BREKKE;19.12.2009;w;26.08.2026 11:35;38;OPD-GEN;Outpatient procedure (procedure);DN;2026-08-10;
+AP300128;P/0051299-J;Corrine Athena POUROS;08.06.1989;w;26.08.2026 23:38;32;GP-WELL;General examination of patient (procedure);DN;2026-08-17;
+AP300129;P/0001849-J;Elisha HEGMANN;22.09.1966;m;27.08.2026 08:03;155;OPD-GEN;Encounter for problem (procedure);CX;2026-08-19;
+AP300130;P/0001849-J;Elisha HEGMANN;22.09.1966;m;27.08.2026 10:38;15;OPD-GEN;Encounter for problem (procedure);DN;2026-08-12;
+AP300131;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;28.08.2026 00:21;15;OPD-GEN;Prenatal visit (regime/therapy);CX;2026-08-07;
+AP300132;P/0023933-N;Lucila Josphine BOEHM;25.12.1981;w;28.08.2026 05:51;56;OPD-SPEC;Patient encounter procedure (procedure);DN;2026-07-29;
+AP300133;P/0067490-I;Bobby Mason ADAMS;01.07.2007;m;30.08.2026 00:28;47;GP-WELL;General examination of patient (procedure);DN;2026-08-02;
+AP300134;P/0001849-J;Elisha HEGMANN;22.09.1966;m;30.08.2026 10:38;155;OPD-GEN;Encounter for problem (procedure);DN;2026-08-01;
+AP300135;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;31.08.2026 12:31;15;GP-WELL;Death Certification;BK;2026-07-26;
+AP300136;P/0092958-P;Joni Donette CROOKS;12.07.2011;;01.09.2026 10:34;37;OPD-GEN;Encounter for check up (procedure);BK;2026-08-20;
+AP300137;P/0051796-A;Arnold Andrea HARTMANN;23.06.1971;m;01.09.2026 23:21;59;GP-WELL;General examination of patient (procedure);BK;2026-07-30;
+AP300138;P/0043725-C;Lou KOCH;25.06.2025;m;02.09.2026 07:23;15;GP-WELL;Well child visit (procedure);BK;2026-08-22;
+AP300139;P/0001849-J;Elisha HEGMANN;22.09.1966;m;02.09.2026 13:13;202;OPD-GEN;Encounter for problem (procedure);BK;2026-08-03;
+AP300140;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;02.09.2026 21:18;33;OPD-SPEC;Encounter for check up (procedure);BK;2026-08-12;
+AP300141;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;04.09.2026 00:21;17;GP-WELL;Well child visit (procedure);BK;2026-08-25;
+AP300142;P/0001849-J;Elisha HEGMANN;22.09.1966;m;05.09.2026 16:35;201;OPD-GEN;Encounter for problem (procedure);BK;2026-08-13;
+AP300143;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;06.09.2026 16:31;25;OPD-GEN;Outpatient procedure (procedure);BK;2026-08-11;
+AP300144;P/0008251-R;Joetta PARKER;31.03.2024;w;06.09.2026 17:04;15;GP-WELL;Well child visit (procedure);BK;2026-08-26;
+--- END OF EXPORT 22 ROWS ---

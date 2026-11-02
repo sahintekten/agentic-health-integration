@@ -1,0 +1,27 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300055;P/0044536-I;Sanford Luigi SCHILLER;03.06.1996;m;13.07.2026 08:23;32;OPD-SPEC;Encounter for check up (procedure);NS;2026-06-28;
+AP300056;P/0064945-Q;Dustin Garrett RUNOLFSDOTTIR;19.06.1978;m;13.07.2026 12:11;48;GP-WELL;General examination of patient (procedure);CX;2026-06-29;
+AP300057;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;13.07.2026 12:31;15;OPD-SPEC;Encounter for check up (procedure);DN;2026-06-08;
+AP300058;P/0001849-J;Elisha HEGMANN;22.09.1966;m;14.07.2026 13:01;216;OPD-GEN;Encounter for problem (procedure);DN;2026-06-26;
+AP300059;P/0044486-E;Barbar BLOCK;24.03.1959;w;14.07.2026 16:32;28;OPD-GEN;Encounter for check up (procedure);DN;2026-06-29;
+AP300060;P/0097464-N;Serita LEFFLER;18.06.1947;w;16.07.2026 07:33;259;OPD-GEN;Hospital admission (procedure);DN;2026-06-21;
+AP300061;P/0028720-Q;Franklyn Otha LOWE;07.03.1997;m;17.07.2026 05:01;52;OPD-GEN;Encounter for check up (procedure);DN;2026-06-13;
+AP300062;P/0001849-J;Elisha HEGMANN;22.09.1966;m;17.07.2026 16:37;143;OPD-GEN;Encounter for problem (procedure);DN;2026-07-09;
+AP300063;P/0068479-I;Genevieve MOHR;22.04.1961;w;18.07.2026 08:41;35;GP-WELL;General examination of patient (procedure);DN;2026-06-27;
+AP300064;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;;18.07.2026 15:03;41;OPD-GEN;Outpatient procedure (procedure);DN;2026-06-30;
+AP300065;P/0096822-P;Charissa Alanna SCHOWALTER;28.01.2001;w;19.07.2026 19:46;15;OPD-GEN;Prenatal visit (regime/therapy);DN;2026-06-12;
+AP300066;P/0044536-I;Sanford Luigi SCHILLER;03.06.1996;m;20.07.2026 08:23;15;OPD-GEN;Encounter for symptom (procedure);BK;2026-07-03;
+AP300067;P/0064945-Q;Dustin Garrett RUNOLFSDOTTIR;19.06.1978;;20.07.2026 12:11;58;OPD-GEN;Encounter for problem (procedure);BK;2026-07-11;
+AP300068;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;20.07.2026 12:31;23;OPD-GEN;Encounter for check up (procedure);BK;2026-07-11;
+AP300069;P/0001849-J;Elisha HEGMANN;22.09.1966;m;20.07.2026 19:00;195;OPD-GEN;Encounter for problem (procedure);BK;2026-06-14;
+AP300070;P/0013791-O;Amalia Rosalia CHAVARRÍA;23.06.2020;w;21.07.2026 03:03;36;OPD-GEN;Encounter for problem (procedure);BK;2026-06-18;
+AP300071;P/0015096-I;Jazmine Brandi VONRUEDEN;12.07.2016;w;21.07.2026 07:41;16;GP-WELL;Well child visit (procedure);BK;2026-06-24;
+AP300072;P/0024274-J;Barb Nohemi WEBER;23.05.1996;w;23.07.2026 08:29;59;OPD-SPEC;Encounter for check up (procedure);BK;2026-06-17;
+AP300073;P/0001849-J;Elisha HEGMANN;22.09.1966;m;23.07.2026 22:15;155;OPD-GEN;Encounter for problem (procedure);BK;2026-07-14;
+AP300074;P/0075423-G;Lorrie LOWE;19.08.2022;w;24.07.2026 12:33;15;GP-WELL;Well child visit (procedure);BK;2026-06-19;
+AP300075;P/0025280-D;Rodrick HAHN;19.03.1951;m;25.07.2026 03:56;30;OPD-GEN;Encounter for problem (procedure);BK;2026-07-06;
+AP300076;P/0079896-R;Chester Arnold STREICH;18.07.1971;m;25.07.2026 06:19;26;OPD-GEN;Encounter for check up (procedure);BK;2026-06-19;
+AP300077;P/0044448-M;Alyssa Roxane SCHUPPE;27.01.2007;w;25.07.2026 23:39;15;OPD-SPEC;Patient encounter procedure (procedure);BK;2026-07-16;
+AP300078;P/0029301-W;Williemae Viva WARD;01.06.2008;w;26.07.2026 10:53;49;GP-WELL;General examination of patient (procedure);BK;2026-07-06;
+AP300079;P/0085370-R;Darcie Karey KILBACK;20.08.1922;w;26.07.2026 22:15;32;GP-WELL;General examination of patient (procedure);BK;2026-06-17;
+--- END OF EXPORT 25 ROWS ---

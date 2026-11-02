@@ -1,0 +1,17 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300040;P/0035692-T;Nia NADER;22.02.2000;w;30.06.2026 13:28;15;OPD-GEN;Postnatal visit (regime/therapy);DN;2026-06-19;
+AP300041;P/0044486-E;Barbar BLOCK;24.03.1959;w;30.06.2026 16:32;45;GP-WELL;General examination of patient (procedure);DN;2026-06-06;
+AP300042;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;01.07.2026 21:18;15;OPD-SPEC;Encounter for check up (procedure);NS;2026-06-21;
+AP300043;P/0001849-J;Elisha HEGMANN;22.09.1966;m;02.07.2026 02:59;132;OPD-GEN;Encounter for problem (procedure);CX;2026-05-29;
+AP300044;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;03.07.2026 00:21;15;OPD-GEN;Prenatal visit (regime/therapy);DN;2026-06-18;
+AP300045;P/0028720-Q;Franklyn Otha LOWE;07.03.1997;m;03.07.2026 05:01;50;GP-WELL;General examination of patient (procedure);DN;2026-05-24;
+AP300046;P/0001849-J;Elisha HEGMANN;22.09.1966;m;05.07.2026 05:11;128;OPD-GEN;Encounter for problem (procedure);DN;2026-06-27;
+AP300047;P/0024274-J;Barb Nohemi WEBER;23.05.1996;w;05.07.2026 08:29;15;OPD-SPEC;Consultation for treatment (procedure);DN;2026-05-28;
+AP300048;P/0014642-O;Maud Pauline BREKKE;19.12.2009;w;06.07.2026 10:24;36;OPD-GEN;Outpatient procedure (procedure);BK;2026-06-24;
+AP300049;P/0014506-Q;Loretta ROSENBAUM;07.10.1996;w;06.07.2026 21:01;15;OPD-SPEC;Patient encounter procedure (procedure);BK;2026-06-16;
+AP300050;P/0001849-J;Elisha HEGMANN;22.09.1966;m;08.07.2026 07:19;210;OPD-GEN;Encounter for problem (procedure);BK;2026-05-31;
+AP300051;P/0047333-W;Colby AUFDERHAR;13.04.1932;;08.07.2026 21:18;33;OPD-GEN;Encounter for check up (procedure);BK;2026-06-05;
+AP300052;P/0010596-Q;Marlys Pei DENESIK;09.07.2026;w;09.07.2026 16:22;15;GP-WELL;Well child visit (procedure);BK;2026-06-01;
+AP300053;P/0013791-O;Amalia Rosalia CHAVARRÍA;23.06.2020;w;09.07.2026 20:03;15;OPD-GEN;Encounter for symptom (procedure);BK;2026-06-03;
+AP300054;P/0001849-J;Elisha HEGMANN;22.09.1966;m;11.07.2026 10:49;132;OPD-GEN;Encounter for problem (procedure);BK;2026-06-08;
+--- END OF EXPORT 15 ROWS ---

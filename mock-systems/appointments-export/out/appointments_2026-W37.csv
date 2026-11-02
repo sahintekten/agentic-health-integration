@@ -1,0 +1,19 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300145;P/0044300-C;Cedric Federico ANKUNDING;19.06.1917;m;08.09.2026 16:34;73;OPD-GEN;Encounter for problem (procedure);DN;2026-08-25;
+AP300146;P/0001849-J;Elisha HEGMANN;22.09.1966;m;08.09.2026 19:56;223;OPD-GEN;Encounter for problem (procedure);NS;2026-08-15;
+AP300147;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;11.09.2026 00:21;89;OPD-GEN;Encounter for check up (procedure);CX;2026-08-04;
+AP300148;P/0001849-J;Elisha HEGMANN;22.09.1966;m;11.09.2026 23:39;227;OPD-GEN;Encounter for problem (procedure);DN;2026-08-22;
+AP300149;P/0067490-I;Bobby Mason ADAMS;01.07.2007;m;13.09.2026 00:28;22;OPD-GEN;Encounter for check up (procedure);DN;2026-08-26;
+AP300150;P/0008251-R;Joetta PARKER;31.03.2024;w;13.09.2026 17:04;16;OPD-GEN;Encounter for check up (procedure);DN;2026-08-22;
+AP300151;P/0096822-P;Charissa Alanna SCHOWALTER;28.01.2001;w;13.09.2026 19:46;15;OPD-GEN;Prenatal visit (regime/therapy);DN;2026-08-20;
+AP300152;P/0025280-D;Rodrick HAHN;19.03.1951;m;14.09.2026 02:04;15;GP-WELL;Death Certification;BK;2026-09-05;
+AP300153;P/0065754-U;Monty LOCKMAN;27.07.2009;m;14.09.2026 14:27;15;GP-WELL;Well child visit (procedure);BK;2026-08-23;
+AP300154;P/0001849-J;Elisha HEGMANN;22.09.1966;m;15.09.2026 03:26;184;OPD-GEN;Encounter for problem (procedure);BK;2026-09-02;
+AP300155;P/0097464-N;Serita LEFFLER;18.06.1947;w;16.09.2026 13:30;32;OPD-SPEC;Encounter for check up (procedure);BK;2026-09-08;
+AP300156;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;16.09.2026 21:18;15;OPD-GEN;Encounter for check up (procedure);BK;2026-08-12;
+AP300157;P/0014642-O;Maud Pauline BREKKE;19.12.2009;w;17.09.2026 12:13;38;OPD-GEN;Outpatient procedure (procedure);BK;2026-09-02;
+AP300158;P/0001849-J;Elisha HEGMANN;22.09.1966;m;18.09.2026 06:30;184;OPD-GEN;Encounter for problem (procedure);BK;2026-08-20;
+AP300159;P/0088988-B;Mitchell Wilmer FRAMI;07.06.1969;m;19.09.2026 18:00;51;GP-WELL;General examination of patient (procedure);BK;2026-08-15;
+AP300160;P/0082702-R;Mac Micah MOORE;12.07.2025;m;19.09.2026 20:47;15;GP-WELL;Well child visit (procedure);BK;2026-09-04;
+AP300161;P/0037980-H;Britteny Gabriele DIETRICH;07.11.2003;w;20.09.2026 05:08;15;OPD-SPEC;Consultation for treatment (procedure);BK;2026-08-19;
+--- END OF EXPORT 17 ROWS ---

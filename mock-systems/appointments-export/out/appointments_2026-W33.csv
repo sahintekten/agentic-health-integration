@@ -1,0 +1,26 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300099;P/0025280-D;Rodrick HAHN;19.03.1951;m;10.08.2026 02:04;49;GP-WELL;General examination of patient (procedure);DN;2026-07-03;
+AP300100;P/0096202-Q;Willian Lorenzo KOELPIN;19.03.1951;m;10.08.2026 02:04;59;GP-WELL;General examination of patient (procedure);NS;2026-07-09;
+AP300101;P/0062260-W;Stanford John BLICK;04.06.2001;m;10.08.2026 12:23;37;GP-WELL;General examination of patient (procedure);DN;2026-07-22;
+AP300102;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;10.08.2026 12:31;15;OPD-SPEC;Encounter for check up (procedure);DN;2026-07-21;
+AP300103;P/0096202-Q;Willian Lorenzo KOELPIN;19.03.1951;m;11.08.2026 02:04;15;OPD-GEN;Follow-up encounter (procedure);DN;2026-07-13;
+AP300104;P/0001849-J;Elisha HEGMANN;22.09.1966;m;11.08.2026 17:01;184;OPD-GEN;Encounter for problem (procedure);DN;2026-08-03;
+AP300105;P/0019110-U;Israel Mohammad JACOBSON;26.08.2020;m;12.08.2026 08:58;15;GP-WELL;Well child visit (procedure);DN;2026-07-17;
+AP300106;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;12.08.2026 15:45;46;OPD-GEN;Outpatient procedure (procedure);DN;2026-07-15;
+AP300107;P/0014642-O;Maud Pauline BREKKE;19.12.2009;;13.08.2026 00:23;77;OPD-GEN;Encounter for symptom (procedure);DN;2026-08-05;
+AP300108;P/0010596-Q;Marlys Pei DENESIK;09.07.2026;w;13.08.2026 16:22;15;GP-WELL;Well child visit (procedure);CX;2026-07-13;
+AP300109;P/0095865-B;Raylene MITCHELL;05.06.1964;w;14.08.2026 00:40;55;GP-WELL;General examination of patient (procedure);DN;2026-07-17;
+AP300110;P/0028720-Q;Franklyn Otha LOWE;07.03.1997;m;14.08.2026 05:53;39;OPD-GEN;Encounter for check up (procedure);DN;2026-08-01;
+AP300111;P/0001849-J;Elisha HEGMANN;22.09.1966;m;14.08.2026 20:05;160;OPD-GEN;Encounter for problem (procedure);NS;2026-07-30;
+AP300112;P/0079896-R;Chester Arnold STREICH;18.07.1971;m;16.08.2026 05:36;34;GP-WELL;General examination of patient (procedure);DN;2026-07-26;
+AP300113;P/0027406-N;Carmina Delinda ROMAGUERA;21.05.1961;w;16.08.2026 06:36;59;GP-WELL;General examination of patient (procedure);DN;2026-07-08;
+AP300114;P/0096822-P;Charissa Alanna SCHOWALTER;28.01.2001;w;16.08.2026 19:46;15;OPD-GEN;Prenatal visit (regime/therapy);DN;2026-08-01;
+AP300115;P/0001849-J;Elisha HEGMANN;22.09.1966;m;17.08.2026 22:45;202;OPD-GEN;Encounter for problem (procedure);BK;2026-07-25;
+AP300116;P/0092958-P;Joni Donette CROOKS;12.07.2011;w;18.08.2026 10:34;15;GP-WELL;Well child visit (procedure);BK;2026-07-20;
+AP300117;P/0057013-T;Richard MILLER;02.04.1997;w;19.08.2026 09:04;19;OPD-SPEC;Patient encounter procedure (procedure);BK;2026-07-30;
+AP300118;P/0095865-B;Raylene MITCHELL;05.06.1964;w;21.08.2026 00:40;15;OPD-GEN;Follow-up encounter (procedure);BK;2026-07-19;
+AP300119;P/0001849-J;Elisha HEGMANN;22.09.1966;m;21.08.2026 02:07;130;OPD-GEN;Encounter for problem (procedure);BK;2026-07-28;
+AP300120;P/0099865-W;Danelle Cathryn GULGOWSKI;21.03.1952;w;21.08.2026 04:14;34;OPD-GEN;Encounter for check up (procedure);BK;2026-08-05;
+AP300121;P/0098608-H;Russel Sterling WOLF;10.11.2018;m;21.08.2026 22:53;15;OPD-GEN;Asthma follow-up (regime/therapy);BK;2026-08-12;
+AP300122;P/0058240-E;Lynsey Cathleen BAILEY;26.05.1991;w;23.08.2026 09:27;15;OPD-SPEC;Patient encounter procedure (procedure);BK;2026-08-01;
+--- END OF EXPORT 24 ROWS ---

@@ -1,0 +1,77 @@
+system: appointments-export
+interface: weekly CSV files in mock-systems/appointments-export/out (one file per ISO week)
+fhir_version: R4
+
+identifier_systems:
+  appt_patno: http://hospital.example.org/fhir/sid/appointments-patno
+  hospital_number: http://hospital.example.org/fhir/sid/hospital-number
+  appt_ref: http://hospital.example.org/fhir/sid/appointment-ref
+
+known_traps:
+  - The files are Windows-1252, not UTF-8. Names with accents break when read as UTF-8.
+  - The delimiter is a semicolon and every line ends with an extra semicolon (an empty last column).
+  - Every file ends with a footer line like "--- END OF EXPORT 12 ROWS ---" that is not data.
+  - The same appointment is in two files - first as booked (BK), then with its final status. The latest file wins.
+  - PatNo is a fourth id format, P/0004521-K. The number in the middle is the hospital number; the letter is a check letter.
+  - PatName is "Given names FAMILY", the opposite order to system A.
+  - Geb.Dat and ApptStart use dd.mm.yyyy; Booked uses yyyy-mm-dd.
+  - ApptStart has no time zone. It is UTC.
+  - Sex uses m and w (German style), sometimes empty.
+
+patient_link:
+  rule: Take the digits between "P/" and "-", remove leading zeros.
+  example: P/0004521-K -> 4521
+  answer_key: patient_crosswalk.csv (column appt_patno)
+
+mappings:
+  - source: ApptRef
+    resource: Encounter
+    path: Encounter.identifier[appt_ref].value
+  - source: PatNo
+    resource: Patient
+    path: Patient.identifier[appt_patno].value
+    transform: Keep as is. The hospital number (P/0004521-K -> 4521) is Patient.id and the subject of the Encounter.
+  - source: PatName
+    resource: Patient
+    path: Patient.name[0]
+    transform: The last word (upper case) is the family name; the words before it are given names.
+  - source: Geb.Dat
+    resource: Patient
+    path: Patient.birthDate
+    transform: dd.mm.yyyy -> YYYY-MM-DD
+  - source: Sex
+    resource: Patient
+    path: Patient.gender
+    value_map: {m: male, w: female}
+    transform: Empty -> unknown.
+  - source: ApptStart
+    resource: Encounter
+    path: Encounter.period.start
+    transform: dd.mm.yyyy HH:MM, UTC -> ISO 8601 with Z.
+  - source: DurMin
+    resource: Encounter
+    path: Encounter.length and Encounter.period.end
+    transform: Minutes. Either as Encounter.length or as period.end = start + minutes.
+  - source: Clinic
+    resource: Encounter
+    path: Encounter.serviceType and Encounter.location
+  - source: ApptType
+    resource: Encounter
+    path: Encounter.type
+  - source: Status
+    resource: Encounter
+    path: Encounter.status
+    value_map: {BK: planned, DN: finished, NS: cancelled, CX: cancelled}
+    transform: NS (no-show) has no own Encounter status in R4; cancelled is the closest.
+  - source: Booked
+    ignore: booking date of the appointment, not part of the Encounter
+
+data_rules:
+  - rule_id: normalise_identifier
+    note: PatNo P/0004521-K -> hospital number 4521.
+  - rule_id: latest_event_wins
+    note: an appointment appears in more than one weekly file; the file from the latest week wins.
+  - rule_id: date_format
+    note: dd.mm.yyyy dates and dd.mm.yyyy HH:MM date-times.
+  - rule_id: timezone_assumption
+    note: ApptStart has no offset; assume UTC.

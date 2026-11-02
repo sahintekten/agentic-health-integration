@@ -1,0 +1,17 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300199;P/0003300-L;Candelaria Roxann FRAMI;15.02.1965;w;19.10.2026 02:28;109;OPD-GEN;Encounter for check up (procedure);DN;2026-09-21;
+AP300200;P/0001849-J;Elisha HEGMANN;22.09.1966;m;19.10.2026 12:07;179;OPD-GEN;Encounter for problem (procedure);DN;2026-09-12;
+AP300201;P/0098553-V;Tabatha Kesha MURPHY;20.02.1945;w;20.10.2026 11:59;51;GP-WELL;General examination of patient (procedure);DN;2026-09-29;
+AP300202;P/0001849-J;Elisha HEGMANN;22.09.1966;m;22.10.2026 15:06;150;OPD-GEN;Encounter for problem (procedure);DN;2026-10-04;
+AP300203;P/0044448-M;Alyssa Roxane SCHUPPE;27.01.2007;w;24.10.2026 23:39;17;OPD-SPEC;Patient encounter procedure (procedure);DN;2026-09-17;
+AP300204;P/0001849-J;Elisha HEGMANN;22.09.1966;m;25.10.2026 17:36;211;OPD-GEN;Encounter for problem (procedure);DN;2026-09-28;
+AP300205;P/0096822-P;Charissa Alanna SCHOWALTER;28.01.2001;w;25.10.2026 19:46;15;OPD-GEN;Prenatal visit (regime/therapy);NS;2026-10-10;
+AP300206;P/0026128-A;Leroy Willie OLSON;18.10.2016;m;27.10.2026 02:43;15;GP-WELL;Well child visit (procedure);BK;2026-10-07;
+AP300207;P/0053911-W;Luz Guadalupe OROZCO;21.08.1973;w;27.10.2026 04:31;46;GP-WELL;General examination of patient (procedure);BK;2026-10-02;
+AP300208;P/0098553-V;Tabatha Kesha MURPHY;20.02.1945;w;27.10.2026 11:59;15;OPD-GEN;Follow-up encounter (procedure);BK;2026-10-05;
+AP300209;P/0003824-G;Thuy WINDLER;22.05.1991;w;28.10.2026 04:19;34;OPD-GEN;Encounter for check up (procedure);BK;2026-10-06;
+AP300210;P/0001849-J;Elisha HEGMANN;22.09.1966;m;28.10.2026 21:07;178;OPD-GEN;Encounter for problem (procedure);BK;2026-09-25;
+AP300211;P/0001849-J;Elisha HEGMANN;22.09.1966;m;29.10.2026 00:05;15;OPD-GEN;Encounter for problem (procedure);BK;2026-09-23;
+AP300212;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;29.10.2026 17:19;31;OPD-GEN;Outpatient procedure (procedure);BK;2026-10-05;
+AP300213;P/0018477-I;Gregorio Emilio CALVILLO;09.09.2011;m;30.10.2026 19:14;15;OPD-GEN;Encounter for check up (procedure);BK;2026-10-12;
+--- END OF EXPORT 15 ROWS ---

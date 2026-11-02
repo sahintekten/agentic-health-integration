@@ -1,0 +1,21 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300011;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;08.06.2026 12:31;15;OPD-SPEC;Encounter for check up (procedure);DN;2026-05-02;
+AP300012;P/0097464-N;Serita LEFFLER;18.06.1947;w;09.06.2026 02:19;354;OPD-GEN;Encounter for problem (procedure);DN;2026-05-02;
+AP300013;P/0049431-E;María Cristina Teresa ROSALES;21.08.1973;w;09.06.2026 04:31;15;GP-WELL;Death Certification;DN;2026-05-07;
+AP300014;P/0014642-O;Maud Pauline BREKKE;19.12.2009;w;09.06.2026 10:06;17;OPD-GEN;Outpatient procedure (procedure);DN;2026-04-30;
+AP300015;P/0044300-C;Cedric Federico ANKUNDING;19.06.1917;m;09.06.2026 16:34;29;OPD-GEN;Encounter for check up (procedure);DN;2026-05-26;
+AP300016;P/0013791-O;Amalia Rosalia CHAVARRÍA;23.06.2020;w;09.06.2026 20:03;15;GP-WELL;Well child visit (procedure);DN;2026-05-21;
+AP300017;P/0043725-C;Lou KOCH;25.06.2025;m;10.06.2026 07:23;15;OPD-SPEC;Encounter for check up (procedure);DN;2026-05-16;
+AP300018;P/0001849-J;Elisha HEGMANN;22.09.1966;m;11.06.2026 01:49;226;OPD-GEN;Encounter for problem (procedure);DN;2026-05-27;
+AP300019;P/0075423-G;Lorrie LOWE;19.08.2022;w;12.06.2026 08:33;15;OPD-GEN;Encounter for symptom (procedure);DN;2026-05-24;
+AP300020;P/0052959-N;Lorette Lesa HAMILL;08.02.2001;w;13.06.2026 06:28;15;OPD-GEN;Prenatal visit (regime/therapy);DN;2026-06-01;
+AP300021;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;15.06.2026 12:31;17;OPD-GEN;Encounter for check up (procedure);BK;2026-06-07;
+AP300022;P/0097464-N;Serita LEFFLER;18.06.1947;w;17.06.2026 13:30;59;OPD-SPEC;Encounter for check up (procedure);BK;2026-05-16;
+AP300023;P/0071924-D;Keira GREENFELDER;28.07.1988;w;18.06.2026 09:36;15;OPD-GEN;Postnatal visit (regime/therapy);BK;2026-05-10;
+AP300024;P/0006861-H;Hong RUNOLFSSON;08.10.1931;w;18.06.2026 18:37;55;GP-WELL;General examination of patient (procedure);BK;2026-05-16;
+AP300025;P/0001849-J;Elisha HEGMANN;22.09.1966;m;18.06.2026 20:29;15;OPD-GEN;Encounter for check up (procedure);BK;2026-05-11;
+AP300026;P/0026128-A;Leroy Willie OLSON;18.10.2016;m;20.06.2026 09:43;15;OPD-GEN;Encounter for symptom (procedure);BK;2026-05-31;
+AP300027;P/0095246-D;Mariel EMARD;26.02.1955;w;20.06.2026 13:58;31;GP-WELL;General examination of patient (procedure);BK;2026-05-13;
+AP300028;P/0082702-R;Mac Micah MOORE;12.07.2025;m;20.06.2026 20:47;15;GP-WELL;Well child visit (procedure);BK;2026-05-22;
+AP300029;P/0096822-P;Charissa Alanna SCHOWALTER;28.01.2001;w;21.06.2026 19:46;15;OPD-GEN;Prenatal visit (regime/therapy);BK;2026-06-01;
+--- END OF EXPORT 19 ROWS ---

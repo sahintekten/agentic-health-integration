@@ -1,0 +1,12 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300001;P/0030060-W;Isaiah PARISIAN;12.10.1936;m;01.06.2026 12:31;15;OPD-GEN;Follow-up encounter (procedure);BK;2026-04-30;
+AP300002;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;01.06.2026 12:31;40;GP-WELL;General examination of patient (procedure);BK;2026-05-22;
+AP300003;P/0043725-C;Lou KOCH;25.06.2025;m;03.06.2026 07:23;15;GP-WELL;Well child visit (procedure);BK;2026-05-13;
+AP300004;P/0097464-N;Serita LEFFLER;18.06.1947;w;03.06.2026 13:30;49;OPD-GEN;Encounter for problem (procedure);BK;2026-04-26;
+AP300005;P/0052959-N;Lorette Lesa HAMILL;08.02.2001;w;04.06.2026 06:28;15;OPD-GEN;Prenatal visit (regime/therapy);BK;2026-05-27;
+AP300006;P/0001849-J;Elisha HEGMANN;22.09.1966;m;04.06.2026 20:29;155;OPD-GEN;Encounter for problem (procedure);BK;2026-05-22;
+AP300007;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;05.06.2026 00:21;15;OPD-GEN;Prenatal visit (regime/therapy);BK;2026-04-29;
+AP300008;P/0003824-G;Thuy WINDLER;22.05.1991;w;06.06.2026 04:19;47;OPD-SPEC;Consultation for treatment (procedure);BK;2026-05-04;
+AP300009;P/0017108-T;Keith Joye PARISIAN;14.06.2020;w;07.06.2026 06:53;108;OPD-GEN;Encounter for check up (procedure);BK;2026-05-18;
+AP300010;P/0001849-J;Elisha HEGMANN;22.09.1966;m;07.06.2026 23:04;165;OPD-GEN;Encounter for problem (procedure);BK;2026-05-16;
+--- END OF EXPORT 10 ROWS ---

@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GROUND_TRUTH = ROOT / "eval" / "ground_truth"
 RESULTS = ROOT / "eval" / "results"
 WORKSPACE = ROOT / "workspace"
-NAMES = {"a": "patient_registry_api", "b": "lab_db", "c": "adt_feed"}
+NAMES = {"a": "patient_registry_api", "b": "lab_db", "c": "adt_feed", "d": "appointments_export"}
 
 HL7_SOURCE = re.compile(r"^([a-z][a-z0-9]{2})[-.](\d+)(?:[.-](\d+))?$")
 
@@ -232,9 +232,9 @@ def print_result(r):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--system", default="all", choices=["a", "b", "c", "all"])
+    parser.add_argument("--system", default="all", choices=["a", "b", "c", "d", "all"])
     args = parser.parse_args()
-    systems = ["a", "b", "c"] if args.system == "all" else [args.system]
+    systems = [s for s in NAMES if (WORKSPACE / s / "mapping.yaml").exists()] if args.system == "all" else [args.system]
     results = [score(s) for s in systems]
     for r in results:
         print_result(r)

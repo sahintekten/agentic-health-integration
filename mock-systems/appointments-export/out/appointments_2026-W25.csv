@@ -1,0 +1,21 @@
+ApptRef;PatNo;PatName;Geb.Dat;Sex;ApptStart;DurMin;Clinic;ApptType;Status;Booked;
+AP300021;P/0017996-K;Darryl Jeffry SCHULIST;12.10.1936;m;15.06.2026 12:31;17;OPD-GEN;Encounter for check up (procedure);DN;2026-06-07;
+AP300022;P/0097464-N;Serita LEFFLER;18.06.1947;w;17.06.2026 13:30;59;OPD-SPEC;Encounter for check up (procedure);DN;2026-05-16;
+AP300023;P/0071924-D;Keira GREENFELDER;28.07.1988;w;18.06.2026 09:36;15;OPD-GEN;Postnatal visit (regime/therapy);DN;2026-05-10;
+AP300024;P/0006861-H;Hong RUNOLFSSON;08.10.1931;w;18.06.2026 18:37;55;GP-WELL;General examination of patient (procedure);DN;2026-05-16;
+AP300025;P/0001849-J;Elisha HEGMANN;22.09.1966;m;18.06.2026 20:29;15;OPD-GEN;Encounter for check up (procedure);DN;2026-05-11;
+AP300026;P/0026128-A;Leroy Willie OLSON;18.10.2016;m;20.06.2026 09:43;15;OPD-GEN;Encounter for symptom (procedure);DN;2026-05-31;
+AP300027;P/0095246-D;Mariel EMARD;26.02.1955;w;20.06.2026 13:58;31;GP-WELL;General examination of patient (procedure);DN;2026-05-13;
+AP300028;P/0082702-R;Mac Micah MOORE;12.07.2025;m;20.06.2026 20:47;15;GP-WELL;Well child visit (procedure);DN;2026-05-22;
+AP300029;P/0096822-P;Charissa Alanna SCHOWALTER;28.01.2001;w;21.06.2026 19:46;15;OPD-GEN;Prenatal visit (regime/therapy);DN;2026-06-01;
+AP300030;P/0051796-A;Arnold Andrea HARTMANN;23.06.1971;m;23.06.2026 00:02;41;OPD-GEN;Encounter for check up (procedure);BK;2026-05-15;
+AP300031;P/0047333-W;Colby AUFDERHAR;13.04.1932;m;24.06.2026 21:18;48;OPD-SPEC;Encounter for check up (procedure);BK;2026-06-16;
+AP300032;P/0071924-D;Keira GREENFELDER;28.07.1988;w;25.06.2026 09:36;15;OPD-SPEC;Consultation for treatment (procedure);BK;2026-05-24;
+AP300033;P/0001849-J;Elisha HEGMANN;22.09.1966;m;25.06.2026 20:29;160;OPD-GEN;Encounter for problem (procedure);BK;2026-05-25;
+AP300034;P/0001849-J;Elisha HEGMANN;22.09.1966;m;25.06.2026 23:09;15;OPD-GEN;Encounter for problem (procedure);BK;2026-05-30;
+AP300035;P/0095246-D;Mariel EMARD;26.02.1955;w;27.06.2026 13:58;15;OPD-GEN;Follow-up encounter (procedure);BK;2026-05-25;
+AP300036;P/0080053-N;Hyacinth Jodi MANTE;30.07.2010;w;27.06.2026 14:35;28;OPD-GEN;Outpatient procedure (procedure);BK;2026-05-20;
+AP300037;P/0026913-D;Erick Josiah ROSENBAUM;06.07.2019;m;27.06.2026 19:02;15;GP-WELL;Well child visit (procedure);BK;2026-06-09;
+AP300038;P/0097464-N;Serita LEFFLER;18.06.1947;w;28.06.2026 18:13;109;OPD-GEN;Follow-up encounter (procedure);BK;2026-06-11;
+AP300039;P/0001849-J;Elisha HEGMANN;22.09.1966;m;28.06.2026 23:09;230;OPD-GEN;Encounter for problem (procedure);BK;2026-06-14;
+--- END OF EXPORT 19 ROWS ---
