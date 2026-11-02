@@ -38,7 +38,7 @@ Return one JSON object with these keys:
     unit_fallback          unit missing on a row; take it from a default somewhere else
     unit_map               legacy unit strings that must become UCUM codes (give the FULL map in "unit_map")
     derive_category        a FHIR category that is not stored but can be derived from another field
-    timezone_assumption    date-times without a zone; say which zone you assume and that you flag it
+    timezone_assumption    date-times without a zone; follow the data policy and flag them as assumed
     normalise_identifier   source patient ids that must be turned into the shared hospital number
     restore_leading_zeros  codes that lost their leading zeros
     trim_whitespace        values with extra spaces
@@ -159,7 +159,8 @@ def adapter_openapi(profile, mapping):
     resources = sorted(
         {item.get("resource") for _, item in _mapping_items(mapping.get("mappings")) if item.get("resource")}
     )
-    resources = [r for r in resources if r in ("Patient", "Observation", "Encounter", "Practitioner")]
+    # the adapters serve these three types; other targets (like Practitioner) stay inside them
+    resources = [r for r in resources if r in ("Patient", "Observation", "Encounter")]
     search = {
         "Patient": [("identifier", "Patient identifier, as system|value or just value"), ("birthdate", "YYYY-MM-DD")],
         "Observation": [("patient", "Patient id"), ("code", "LOINC code, as system|code"), ("date", "Date filter")],
@@ -250,7 +251,7 @@ def run(system):
     profile = json.loads(profile_path.read_text())
     inventory = json.loads((out / "inventory.json").read_text())
     reference = (config.FHIR_REF / "r4_reference.md").read_text()
-    id_policy = (config.FHIR_REF / "id_policy.md").read_text()
+    id_policy = (config.FHIR_REF / "id_policy.md").read_text() + "\n" + (config.FHIR_REF / "data_policy.md").read_text()
 
     profile_text = _fit(lambda n: _profile_view(profile, inventory, n))
     messages = [
