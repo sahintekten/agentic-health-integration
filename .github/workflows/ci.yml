@@ -41,3 +41,26 @@ jobs:
       - name: stop
         if: always()
         run: docker compose down -v
+
+  adapters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "8.0.x"
+      - name: start mock systems
+        run: docker compose up -d --build --wait
+      - name: build and test the generated adapters
+        run: |
+          for dir in generated/*/; do
+            [ -f "$dir/tests/Adapter.Tests.csproj" ] || continue
+            echo "== $dir"
+            dotnet test "$dir/tests/Adapter.Tests.csproj" -nologo
+          done
+      - name: logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: stop
+        if: always()
+        run: docker compose down -v

@@ -45,3 +45,44 @@ services:
       interval: 5s
       timeout: 5s
       retries: 12
+
+  # generated FHIR adapters (phase 3): docker compose --profile adapters up
+  adapter-a:
+    profiles: [adapters]
+    build: ./generated/a
+    ports:
+      - "9001:8080"
+    environment:
+      REGISTRY_URL: http://patient-registry-api:8001
+    depends_on:
+      patient-registry-api:
+        condition: service_healthy
+
+  adapter-b:
+    profiles: [adapters]
+    build: ./generated/b
+    ports:
+      - "9002:8080"
+    environment:
+      LAB_DB_HOST: lab-db
+      LAB_DB_PORT: "5432"
+      LAB_DB_USER: ${LAB_DB_USER:-labuser}
+      LAB_DB_PASSWORD: ${LAB_DB_PASSWORD:-labpass}
+    depends_on:
+      lab-db:
+        condition: service_healthy
+
+  adapter-c:
+    profiles: [adapters]
+    build: ./generated/c
+    ports:
+      - "9003:8080"
+      - "2576:2576"
+    environment:
+      ADT_OUTBOX: /data/outbox
+      MLLP_PORT: "2576"
+    volumes:
+      - ./mock-systems/adt-feed/outbox:/data/outbox:ro
+    depends_on:
+      adt-feed:
+        condition: service_healthy

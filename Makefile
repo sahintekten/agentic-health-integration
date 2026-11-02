@@ -8,7 +8,7 @@ AGENT_FLAGS = $(if $(YES),--yes,)
 export
 
 .PHONY: help venv hooks data synthea transform up down seed smoke test replay-adt send-adt lint \
-	discover design agents score
+	discover design agents score generate validate pipeline metrics up-adapters
 
 help:
 	@echo "make data         run Synthea (if needed) and build the seed files"
@@ -21,8 +21,13 @@ help:
 	@echo "make test         run all tests (smoke tests and the eval guard)"
 	@echo "make discover SYSTEM=a   run the discover agent (add YES=1 to skip the review prompt)"
 	@echo "make design SYSTEM=a     run the design agent"
-	@echo "make agents SYSTEM=all   run discover and design"
+	@echo "make agents SYSTEM=all   run discover then design (use make pipeline for all steps)"
 	@echo "make score SYSTEM=a      score the mapping against the ground truth"
+	@echo "make generate SYSTEM=a   generate the .NET adapter"
+	@echo "make validate SYSTEM=a   build, test and check the adapter, with self-healing"
+	@echo "make pipeline SYSTEM=a   discover, design, generate and validate"
+	@echo "make metrics             print the metrics table"
+	@echo "make up-adapters  start the generated adapters too (ports 9001-9003)"
 	@echo "make lint         run all pre-commit checks"
 	@echo "make hooks        install the git hooks"
 
@@ -51,7 +56,7 @@ up:
 	docker compose up -d --build --wait
 
 down:
-	docker compose down -v
+	docker compose --profile adapters down -v
 
 seed: transform
 	docker compose up -d --build --force-recreate --renew-anon-volumes --wait
@@ -69,7 +74,23 @@ design: venv
 	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step design $(AGENT_FLAGS)
 
 agents: venv
-	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step all $(AGENT_FLAGS)
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step discover $(AGENT_FLAGS)
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step design $(AGENT_FLAGS)
+
+generate: venv
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step generate $(AGENT_FLAGS)
+
+validate: venv
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step validate $(AGENT_FLAGS)
+
+pipeline: venv
+	$(VENV)/bin/python -m agents run --system $(SYSTEM) --step pipeline $(AGENT_FLAGS)
+
+metrics: venv
+	$(VENV)/bin/python -m agents metrics
+
+up-adapters:
+	docker compose --profile adapters up -d --build --wait
 
 score: venv
 	$(VENV)/bin/python eval/score.py --system $(SYSTEM)
