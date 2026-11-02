@@ -54,7 +54,8 @@ public static class Mapper
             try
             {
                 var patient = MapPatient(row, data);
-                if (patient == null) continue;
+                if (patient == null)
+                    continue;
 
                 // The same hospital number must not produce two Patient resources.
                 if (!seenIds.Add(patient.Id))
@@ -106,7 +107,8 @@ public static class Mapper
         if (DigitsOnly.IsMatch(digits) && long.TryParse(digits, NumberStyles.None, CultureInfo.InvariantCulture, out var number))
         {
             var id = number.ToString(CultureInfo.InvariantCulture);
-            if (id != rawId) data.CountRule("normalise_identifier");
+            if (id != rawId)
+                data.CountRule("normalise_identifier");
             return id;
         }
 
@@ -125,24 +127,28 @@ public static class Mapper
 
     private static void AddName(Patient patient, string? rawName, MappedData data)
     {
-        if (string.IsNullOrWhiteSpace(rawName)) return;
+        if (string.IsNullOrWhiteSpace(rawName))
+            return;
 
         // Rule trim_whitespace: trim and collapse repeated spaces before splitting.
         var name = Spaces.Replace(rawName.Trim(), " ");
-        if (name != rawName) data.CountRule("trim_whitespace");
+        if (name != rawName)
+            data.CountRule("trim_whitespace");
 
         var comma = name.IndexOf(',');
         var familyPart = comma >= 0 ? name.Substring(0, comma).Trim() : name;
         var givenPart = comma >= 0 ? name.Substring(comma + 1).Trim() : "";
 
         var humanName = new HumanName();
-        if (familyPart.Length > 0) humanName.Family = TitleCase(familyPart);
+        if (familyPart.Length > 0)
+            humanName.Family = TitleCase(familyPart);
 
         var givens = givenPart
             .Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Select(TitleCase)
             .ToList();
-        if (givens.Count > 0) humanName.Given = givens;
+        if (givens.Count > 0)
+            humanName.Given = givens;
 
         if (humanName.Family != null || givens.Count > 0)
             patient.Name.Add(humanName);
@@ -152,7 +158,8 @@ public static class Mapper
     private static void AddBirthDate(Patient patient, string? raw, MappedData data)
     {
         var text = Clean(raw);
-        if (text == null) return;
+        if (text == null)
+            return;
 
         if (DateTime.TryParseExact(text, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
         {
@@ -178,19 +185,24 @@ public static class Mapper
         var city = Clean(row.Get("town"));
         var postal = FixPostalCode(Clean(row.Get("post_cd")), data);
 
-        if (line == null && city == null && postal == null) return;
+        if (line == null && city == null && postal == null)
+            return;
 
         var address = new Address();
-        if (line != null) address.Line = new[] { line };
-        if (city != null) address.City = city;
-        if (postal != null) address.PostalCode = postal;
+        if (line != null)
+            address.Line = new[] { line };
+        if (city != null)
+            address.City = city;
+        if (postal != null)
+            address.PostalCode = postal;
         patient.Address.Add(address);
     }
 
     // Rule restore_leading_zeros: pad short numeric ZIP codes to 5 digits (US assumed).
     private static string? FixPostalCode(string? postal, MappedData data)
     {
-        if (postal == null) return null;
+        if (postal == null)
+            return null;
         if (DigitsOnly.IsMatch(postal) && postal.Length < 5)
         {
             data.CountRule("restore_leading_zeros");
@@ -202,7 +214,8 @@ public static class Mapper
     private static void AddMaritalStatus(Patient patient, string? raw)
     {
         var code = Clean(raw);
-        if (code == null || !MaritalMap.TryGetValue(code, out var mapped)) return;
+        if (code == null || !MaritalMap.TryGetValue(code, out var mapped))
+            return;
 
         var coding = new Coding(MaritalSystem, mapped, MaritalDisplay[code]);
         patient.MaritalStatus = new CodeableConcept { Coding = new List<Coding> { coding } };
@@ -213,7 +226,8 @@ public static class Mapper
     private static void AddDeceased(Patient patient, string? raw, MappedData data)
     {
         var text = Clean(raw);
-        if (text == null) return;
+        if (text == null)
+            return;
 
         if (IsoDate.IsMatch(text) &&
             DateTime.TryParseExact(text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
@@ -230,7 +244,8 @@ public static class Mapper
 
     private static string? Clean(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value)) return null;
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
         return value.Trim();
     }
 

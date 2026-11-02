@@ -3,6 +3,8 @@ using Adapter;
 using Hl7.Fhir.Model;
 
 var builder = WebApplication.CreateBuilder(args);
+// framework request logs include query strings such as ?patient=<id>, so keep them quiet
+builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
 builder.Services.AddSingleton<ISourceReader, RegistryReader>();
 builder.Services.AddSingleton<FhirStore>();
 
