@@ -1,7 +1,7 @@
 """The agents must never read the answer key in eval/ground_truth.
 
 1. Static check: no file in agents/ mentions the folder name.
-2. Runtime check: run discover and design for all three systems with the
+2. Runtime check: run discover, design and generate for all three systems with the
    offline LLM provider while an audit hook watches every open() call. Any
    open of a file under eval/ground_truth by code in agents/ fails the test.
 
@@ -79,13 +79,17 @@ def test_agents_never_open_the_answer_key(tmp_path, monkeypatch):
     monkeypatch.setenv("LLM_PROVIDER", "fake")
     monkeypatch.setenv("LLM_CACHE", "0")
     monkeypatch.setenv("AGENTS_WORKSPACE", str(tmp_path))
+    monkeypatch.setenv("AGENTS_GENERATED", str(tmp_path / "generated"))
     from agents.__main__ import main
 
     _state.update(on=True, violations=[])
     try:
-        code = main(["run", "--system", "all", "--step", "all", "--yes"])
+        codes = [
+            main(["run", "--system", "all", "--step", step, "--yes"]) for step in ("discover", "design", "generate")
+        ]
     finally:
         _state["on"] = False
-    assert code == 0
+    assert codes == [0, 0, 0]
     assert (tmp_path / "c" / "mapping.yaml").exists()
+    assert (tmp_path / "generated" / "c" / "src" / "Mapper.cs").exists()
     assert _state["violations"] == []

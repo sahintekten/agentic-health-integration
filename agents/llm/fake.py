@@ -9,5 +9,8 @@ class Fake(Provider):
 
     def call(self, messages, model, json_mode):
         if json_mode:
-            return Result(text='{"summary": "offline test reply", "fields": [], "mappings": []}')
+            return Result(
+                text='{"summary": "offline test reply", "fields": [], "mappings": [], "files": {}, '
+                '"MappingTests.cs": "namespace Adapter.Tests;", "DataRulesTests.cs": "namespace Adapter.Tests;"}'
+            )
         return Result(text="offline test reply")
