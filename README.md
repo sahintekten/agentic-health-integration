@@ -41,7 +41,8 @@ Set `LLM_PROVIDER` in `.env`:
 
 | Provider | Notes |
 | --- | --- |
-| `github_models` | GitHub Models with `GITHUB_TOKEN`. GitHub retired this service on 2026-07-30, so it now fails with a clear error. |
+| `gemini` | The default. Google AI Studio Gemini API with `GEMINI_API_KEY` (free tier). Strong = `gemini-3.8-flash` (falls back to `gemini-3.6-flash` when it is overloaded), fast = `gemini-3.5-flash-lite`. Change them with `GEMINI_MODEL_STRONG` and `GEMINI_MODEL_FAST`. Calls are spaced about 6.5 seconds apart to stay under the free limits. |
+| `github_models` | Retired by GitHub on 2026-07-30. Kept only so an old setting gives a clear error. |
 | `claude_code` | Runs the local `claude -p` command. For development only. It needs the Claude Code CLI installed and logged in. It runs with no tools in an empty folder. |
 | `anthropic` | Uses `ANTHROPIC_API_KEY`. Not tested yet. |
 | `azure_openai` | Uses the `AZURE_OPENAI_*` keys. Not tested yet. |
