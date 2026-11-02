@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Hl7.Fhir.R4" Version="6.8.0" />
+    <PackageReference Include="Hl7.Fhir.Specification.Data.R4" Version="6.8.0" />
+    <PackageReference Include="Firely.Fhir.Validation.R4" Version="3.6.0" />
+  </ItemGroup>
+</Project>

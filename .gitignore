@@ -26,3 +26,8 @@ mock-systems/adt-feed/inbox/*
 .DS_Store
 .idea/
 .vscode/
+
+# .NET build output
+bin/
+obj/
+TestResults/
