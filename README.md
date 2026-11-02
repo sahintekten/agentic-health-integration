@@ -23,7 +23,9 @@ The full pipeline has five steps:
 4. **Validate**: build, test and check the adapter, and repair it when something fails. *(done)*
 5. **Operate**: run the adapters behind a gateway and watch them on a dashboard. *(done)*
 
-See [docs/architecture.md](docs/architecture.md) for a diagram of the whole system.
+![Architecture](docs/architecture.png)
+
+See [docs/architecture.md](docs/architecture.md) for the diagram source and a short explanation.
 
 Discover first collects facts with plain code (`inventory.json`): field types, null rates, formats, duplicates, doc errors. Then a small LLM turns these facts into a profile (`profile.json`) with a meaning, format, PII flag and confidence for each field. The profile is checked against the inventory, so wrong guesses show up as `checks`.
 

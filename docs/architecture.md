@@ -1,5 +1,9 @@
 # Architecture
 
+![Architecture](architecture.png)
+
+The Mermaid source of the picture:
+
 ```mermaid
 flowchart LR
     subgraph sources["Mock hospital systems (synthetic data)"]
@@ -55,8 +59,8 @@ flowchart LR
 - The **LLM provider layer** sits behind every agent call, so the provider can change without changing the agents.
 - **eval/** holds the answer key and the scorer. A test in CI makes sure the agents never open the answer key.
 
-To export the diagram as an image:
+To make `architecture.png` again after you change the diagram (needs Node; the first run downloads mermaid-cli):
 
 ```bash
-npx -y @mermaid-js/mermaid-cli -i docs/architecture.md -o docs/architecture.png
+make diagram
 ```

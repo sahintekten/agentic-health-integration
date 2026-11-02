@@ -9,7 +9,7 @@ export
 
 .PHONY: help venv hooks data synthea transform up down seed smoke test replay-adt send-adt lint \
 	discover design agents score generate validate pipeline metrics up-adapters \
-	demo-add-system demo-reset validate-baseline dashboard gateway-test
+	demo-add-system demo-reset validate-baseline dashboard gateway-test diagram
 
 help:
 	@echo "make data         run Synthea (if needed) and build the seed files"
@@ -111,6 +111,11 @@ dashboard: venv
 
 gateway-test:
 	dotnet test gateway/tests/Gateway.Tests.csproj
+
+diagram:
+	python3 -c "t=open('docs/architecture.md').read(); s=t.index('\x60\x60\x60mermaid')+10; open('docs/.architecture.mmd','w').write(t[s:t.index('\x60\x60\x60',s)].strip()+'\\n')"
+	npx -y @mermaid-js/mermaid-cli@11.4.2 -i docs/.architecture.mmd -o docs/architecture.png -b white -w 1800 -s 2
+	rm docs/.architecture.mmd
 
 score: venv
 	$(VENV)/bin/python eval/score.py --system $(SYSTEM)
