@@ -51,6 +51,8 @@ jobs:
           dotnet-version: "8.0.x"
       - name: start mock systems
         run: docker compose up -d --build --wait
+      - name: test the gateway
+        run: dotnet test gateway/tests/Gateway.Tests.csproj -nologo
       - name: build and test the generated adapters
         run: |
           for dir in generated/*/; do

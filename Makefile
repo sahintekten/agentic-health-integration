@@ -8,7 +8,8 @@ AGENT_FLAGS = $(if $(YES),--yes,)
 export
 
 .PHONY: help venv hooks data synthea transform up down seed smoke test replay-adt send-adt lint \
-	discover design agents score generate validate pipeline metrics up-adapters
+	discover design agents score generate validate pipeline metrics up-adapters \
+	demo-add-system demo-reset validate-baseline dashboard gateway-test
 
 help:
 	@echo "make data         run Synthea (if needed) and build the seed files"
@@ -27,7 +28,11 @@ help:
 	@echo "make validate SYSTEM=a   build, test and check the adapter, with self-healing"
 	@echo "make pipeline SYSTEM=a   discover, design, generate and validate"
 	@echo "make metrics             print the metrics table"
-	@echo "make up-adapters  start the generated adapters too (ports 9001-9003)"
+	@echo "make up-adapters  start the generated adapters (9001-9003) and the gateway (9000)"
+	@echo "make dashboard    start the dashboard on http://localhost:8050"
+	@echo "make demo-add-system SYSTEM=d   live demo: add a new system with review prompts"
+	@echo "make demo-reset SYSTEM=d        remove the demo system again"
+	@echo "make validate-baseline SYSTEM=a run the validator on the hand-written baseline"
 	@echo "make lint         run all pre-commit checks"
 	@echo "make hooks        install the git hooks"
 
@@ -91,6 +96,21 @@ metrics: venv
 
 up-adapters:
 	docker compose --profile adapters up -d --build --wait
+
+demo-add-system: venv
+	LLM_CACHE=0 $(VENV)/bin/python -m agents demo --system $(SYSTEM)
+
+demo-reset: venv
+	$(VENV)/bin/python -m agents demo-reset --system $(SYSTEM)
+
+validate-baseline: venv
+	$(VENV)/bin/python -m agents validate-baseline --system $(SYSTEM)
+
+dashboard: venv
+	$(VENV)/bin/uvicorn dashboard.app:app --port 8050
+
+gateway-test:
+	dotnet test gateway/tests/Gateway.Tests.csproj
 
 score: venv
 	$(VENV)/bin/python eval/score.py --system $(SYSTEM)

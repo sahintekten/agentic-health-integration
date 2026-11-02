@@ -5,7 +5,6 @@ import hashlib
 import json
 import os
 import subprocess
-import sys
 from datetime import datetime, timezone
 
 from agents import config
@@ -54,11 +53,12 @@ def ask(system, step, summary_fn, auto=False):
         stamp(system, step, auto=True)
         print(f"[{step}] approved automatically (--yes)")
         return True
-    if not sys.stdin.isatty():
-        raise SystemExit("Not an interactive terminal. Run again with --yes to approve without prompts.")
     main_file = config.system_dir(system) / STEP_FILES[step][-1 if step == "discover" else 0]
     while True:
-        answer = input(f"\n[{step}] approve? [y/n/edit] ").strip().lower()
+        try:
+            answer = input(f"\n[{step}] approve? [y/n/edit] ").strip().lower()
+        except EOFError:
+            raise SystemExit(f"No answer for the {step} review. Run with --yes to approve without prompts.") from None
         if answer in ("y", "yes"):
             stamp(system, step, auto=False)
             return True

@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 import yaml
 
-from agents import config, design, discover, generate, metrics, review, validate
+from agents import config, demo, design, discover, generate, metrics, progress, review, validate
 from agents.llm import LLMError
 from agents.llm.runlog import RUN_ID, summary
 
@@ -20,10 +20,17 @@ PIPELINE = ["discover", "design", "generate", "validate"]
 
 def _timed(system, step, fn):
     started = datetime.now(timezone.utc)
+    progress.emit(system, step, "started")
+    ok = False
     try:
-        return fn()
+        result = fn()
+        ok = True
+        return result
     finally:
-        metrics.record_step(system, step, started, datetime.now(timezone.utc))
+        finished = datetime.now(timezone.utc)
+        metrics.record_step(system, step, started, finished)
+        seconds = (finished - started).total_seconds()
+        progress.emit(system, step, "finished" if ok else "failed", f"{seconds:.0f} s")
 
 
 def run_system(system, steps, auto):
@@ -47,8 +54,11 @@ def run_system(system, steps, auto):
         else:
             result = _timed(system, step, lambda: validate.run(system))
             show = lambda: validate.summarise(result)  # noqa: E731
+        progress.emit(system, step, "waiting for review", show().splitlines()[0][:160])
         if not review.ask(system, step, show, auto):
+            progress.emit(system, step, "rejected")
             return False
+        progress.emit(system, step, "approved", "auto (--yes)" if auto else "by reviewer")
     return True
 
 
@@ -56,11 +66,51 @@ def main(argv=None):
     parser = argparse.ArgumentParser(prog="python -m agents")
     sub = parser.add_subparsers(dest="command", required=True)
     run = sub.add_parser("run", help="run agent steps for one system")
-    run.add_argument("--system", required=True, choices=["a", "b", "c", "all"])
+    run.add_argument("--system", required=True, choices=[*config.SYSTEMS, "all"])
     run.add_argument("--step", default="pipeline", choices=PIPELINE + ["pipeline", "all"])
     run.add_argument("--yes", action="store_true", help="approve every step without asking")
     sub.add_parser("metrics", help="print the metrics table")
+    for name, text in [
+        ("demo", "run the pipeline with review prompts, start the adapter and register it"),
+        ("demo-reset", "remove a demo system again"),
+        ("register", "register an adapter in the gateway"),
+        ("validate-baseline", "run the validator checks on the hand-written baseline"),
+    ]:
+        p = sub.add_parser(name, help=text)
+        p.add_argument("--system", required=True, choices=list(config.SYSTEMS))
     args = parser.parse_args(argv)
+
+    if args.command == "register":
+        print(demo.register(args.system))
+        return 0
+    if args.command == "demo-reset":
+        print(demo.reset(args.system))
+        return 0
+    if args.command == "validate-baseline":
+        result = validate.run(
+            args.system, out=config.ROOT / "baseline" / args.system, repair=False, report_name="baseline_validate"
+        )
+        print(validate.summarise(result))
+        return 0 if result["status"] == "passed" else 1
+    if args.command == "demo":
+        watch = demo.Stopwatch()
+        if not run_system(args.system, PIPELINE, auto=False):
+            return 1
+        watch.lap("pipeline")
+        progress.emit(args.system, "deploy", "started", f"adapter-{args.system}")
+        demo.start_adapter(args.system)
+        watch.lap("start adapter")
+        stats = demo.register(args.system)
+        watch.lap("register in gateway")
+        progress.emit(args.system, "deploy", "finished", json.dumps(stats)[:160])
+        demo.save_timing(args.system, watch.total, watch.parts)
+        print(f"\ngateway index: {stats}")
+        print(
+            f"demo finished in {watch.total / 60:.1f} minutes "
+            + json.dumps({k: round(v) for k, v in watch.parts.items()})
+        )
+        print("\n" + metrics.table(metrics.collect(args.system)))
+        return 0
 
     if args.command == "metrics":
         collected = {}
@@ -70,7 +120,7 @@ def main(argv=None):
         print(metrics.table(collected))
         return 0
 
-    systems = ["a", "b", "c"] if args.system == "all" else [args.system]
+    systems = list(config.SYSTEMS) if args.system == "all" else [args.system]
     steps = PIPELINE if args.step in ("pipeline", "all") else [args.step]
     ok = True
     try:
