@@ -61,7 +61,7 @@ up:
 	docker compose up -d --build --wait
 
 down:
-	docker compose --profile adapters down -v
+	docker compose --profile adapters --profile demo down -v
 
 seed: transform
 	docker compose up -d --build --force-recreate --renew-anon-volumes --wait
