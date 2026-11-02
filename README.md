@@ -8,7 +8,45 @@ Hospitals have many old systems that do not talk to each other. Each one stores 
 
 ## Status
 
-Phase 1 is done. It has the repo, the synthetic data and three mock hospital systems for the agents to work on. There are no agents yet. They come in phase 2.
+- Phase 1 is done: the repo, the synthetic data and three mock hospital systems.
+- Phase 2 is done: the LLM layer, the Discover agent, the Design agent, a review step and a scorer.
+- Phase 3 (generate .NET code) is next.
+
+## How the agents work
+
+The full pipeline has five steps:
+
+1. **Discover**: look at a system and describe every field. *(done)*
+2. **Design**: map the fields to FHIR R4, write an API spec for the adapter and a patient ID plan. *(done)*
+3. **Generate**: write the .NET 8 adapter code and tests. *(phase 3)*
+4. **Validate**: run the generated tests against the mock systems. *(later)*
+5. **Operate**: run the adapter and watch it. *(later)*
+
+Discover first collects facts with plain code (`inventory.json`): field types, null rates, formats, duplicates, doc errors. Then a small LLM turns these facts into a profile (`profile.json`) with a meaning, format, PII flag and confidence for each field. The profile is checked against the inventory, so wrong guesses show up as `checks`.
+
+Design gives the profile and a short FHIR R4 reference (`agents/fhir_ref/`) to a stronger LLM. It writes `mapping.yaml`, `openapi.yaml` and `id_strategy.md`.
+
+After each step you see a summary and answer `approve? [y/n/edit]`. Approved steps get a `reviewed_by` and `reviewed_at` stamp in `workspace/<system>/review.json`. Use `--yes` to skip the questions.
+
+```bash
+python -m agents run --system a --step all     # or: make agents SYSTEM=a
+python eval/score.py --system a                # or: make score SYSTEM=a
+```
+
+All outputs go to `workspace/<system>/`. The LLM cache is in `.cache/llm/` and every call is logged in `workspace/run_log.jsonl`. Both are ignored by git.
+
+### LLM providers
+
+Set `LLM_PROVIDER` in `.env`:
+
+| Provider | Notes |
+| --- | --- |
+| `github_models` | GitHub Models with `GITHUB_TOKEN`. GitHub retired this service on 2026-07-30, so it now fails with a clear error. |
+| `claude_code` | Runs the local `claude -p` command. For development only. It needs the Claude Code CLI installed and logged in. It runs with no tools in an empty folder. |
+| `anthropic` | Uses `ANTHROPIC_API_KEY`. Not tested yet. |
+| `azure_openai` | Uses the `AZURE_OPENAI_*` keys. Not tested yet. |
+
+Set `LLM_CACHE=0` to turn the cache off.
 
 ## What is in the repo
 
@@ -19,10 +57,10 @@ Phase 1 is done. It has the repo, the synthetic data and three mock hospital sys
 | `mock-systems/adt-feed` | System C. An HL7 v2 ADT feed (MLLP over TCP, plus .hl7 files). |
 | `data/scripts` | A script that runs Synthea, and Python scripts that turn its CSV files into seed data for each system. |
 | `data/synthea` | Raw Synthea output. Not in git. |
-| `eval/ground_truth` | The correct mappings for each system. Only for scoring. |
-| `agents` | Python agents (phase 2). Empty for now. |
+| `eval` | The correct mappings for each system (`ground_truth/`) and the scorer (`score.py`). |
+| `agents` | Python agents: LLM layer, Discover, Design and the review step. |
 | `generated` | .NET code that the agents will write. Empty for now. |
-| `tests/smoke` | Quick tests that check the three systems are up and have data. |
+| `tests` | Smoke tests for the three systems, and the eval guard test. |
 
 ## What you need
 
@@ -80,7 +118,7 @@ The three systems use different formats for the same things, like ids, dates, ge
 
 The correct answers are in `eval/ground_truth`. **The agents must never read `eval/` or the source code in `mock-systems/` and `data/scripts/`.** They should only use the system interfaces: HTTP, SQL, MLLP and the outbox files. We use the ground truth only to score the agents.
 
-We keep `eval/` public so anyone can check how we measure accuracy. In phase 2 we will add a test that fails if an agent tries to open anything under `eval/`.
+We keep `eval/` public so anyone can check how we measure accuracy. `tests/test_eval_guard.py` runs the agents and fails if any agent code opens a file in `eval/ground_truth`. `eval/score.py` is the only code that reads it.
 
 ## Data
 
