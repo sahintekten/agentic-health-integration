@@ -149,3 +149,11 @@ derived:
     rule: Reference to the Patient from PID-3.2.
   - path: Encounter.status
     rule: A01 and A08 -> in-progress, A03 -> finished.
+
+data_rules:
+  - rule_id: normalise_identifier
+    note: PID-3 is HOSP^4521^MR; the number is component 2.
+  - rule_id: timezone_assumption
+    note: HL7 timestamps have no offset; they are UTC in this feed.
+  - rule_id: latest_event_wins
+    note: A01, A08 and A03 for one visit; the latest message decides the Encounter state.

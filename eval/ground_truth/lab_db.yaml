@@ -128,3 +128,19 @@ unit_map:
   ML/MIN: mL/min
   IN: "[in_i]"
   MM/HR: mm/h
+
+data_rules:
+  - rule_id: drop_duplicates
+    note: same PT_REF, TST_CD, RSLT_DT and trimmed LB_VAL1; keep the lowest RSLT_ID.
+  - rule_id: exclude_test_records
+    note: PT_REF 999999 (ZZTEST PATIENT) and its results.
+  - rule_id: unit_fallback
+    note: UOM null -> LB_TST_CODES.DFLT_UOM.
+  - rule_id: unit_map
+    note: legacy units -> UCUM (see unit_map).
+  - rule_id: derive_category
+    note: Observation.category (vital-signs or laboratory) from the test code.
+  - rule_id: trim_whitespace
+    note: LB_VAL1 has leading spaces.
+  - rule_id: date_format
+    note: RSLT_DT is epoch seconds and PT_DOB is an integer YYYYMMDD.

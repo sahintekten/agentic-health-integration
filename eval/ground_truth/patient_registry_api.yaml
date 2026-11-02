@@ -85,3 +85,13 @@ mappings:
     ignore: paging envelope
   - source: recs
     ignore: paging envelope (the list of patient records)
+
+data_rules:
+  - rule_id: normalise_identifier
+    note: pt_id MRN-004521 -> hospital number 4521 (strip prefix and leading zeros).
+  - rule_id: restore_leading_zeros
+    note: post_cd lost its leading zero in about 30% of records; pad to 5 digits.
+  - rule_id: trim_whitespace
+    note: nm_full has extra spaces in some records.
+  - rule_id: date_format
+    note: dob is DD/MM/YYYY, not MM/DD/YYYY as the OpenAPI document says.

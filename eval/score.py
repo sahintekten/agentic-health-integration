@@ -16,6 +16,8 @@ How matching works:
   and "lookup" accept any prediction for that source.
 - Extra predicted "ignore" items for sources that are not in the ground truth
   are not counted.
+- Data rules are scored on their own: the set of predicted rule_id values
+  against the expected set. Rules with rule_id "other" are not counted.
 """
 
 import argparse
@@ -113,12 +115,37 @@ def describe(target):
     return " | ".join(paths) if kind == "map" else kind
 
 
+def _f1(hit, n_pred, n_gt):
+    precision = hit / n_pred if n_pred else 0.0
+    recall = hit / n_gt if n_gt else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    return round(precision, 3), round(recall, 3), round(f1, 3)
+
+
+def score_rules(gt_doc, pred_doc):
+    expected = {str(r.get("rule_id")) for r in gt_doc.get("data_rules") or []}
+    predicted = {str(r.get("rule_id")) for r in pred_doc.get("data_rules") or [] if isinstance(r, dict)}
+    predicted.discard("other")
+    hit = expected & predicted
+    precision, recall, f1 = _f1(len(hit), len(predicted), len(expected))
+    return {
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "found": sorted(hit),
+        "missed": sorted(expected - predicted),
+        "extra": sorted(predicted - expected),
+    }
+
+
 def score(system):
-    gt = flatten(yaml.safe_load((GROUND_TRUTH / f"{NAMES[system]}.yaml").read_text()))
+    gt_doc = yaml.safe_load((GROUND_TRUTH / f"{NAMES[system]}.yaml").read_text())
+    gt = flatten(gt_doc)
     mapping_path = WORKSPACE / system / "mapping.yaml"
     if not mapping_path.exists():
         raise SystemExit(f"{mapping_path} not found. Run the design step first.")
-    pred = flatten(yaml.safe_load(mapping_path.read_text()) or {})
+    pred_doc = yaml.safe_load(mapping_path.read_text()) or {}
+    pred = flatten(pred_doc)
 
     rows, gt_pairs, gt_hit = [], 0, 0
     used_pred = set()
@@ -177,6 +204,7 @@ def score(system):
         },
         "fields": rows,
         "extra": extra,
+        "rules": score_rules(gt_doc, pred_doc),
     }
     RESULTS.mkdir(parents=True, exist_ok=True)
     (RESULTS / f"{system}.json").write_text(json.dumps(result, indent=1))
@@ -195,6 +223,11 @@ def print_result(r):
         f"precision {r['precision']:.2f}  recall {r['recall']:.2f}  F1 {r['f1']:.2f}  "
         f"(correct {c['correct']}, wrong {c['wrong']}, missed {c['missed']}, extra {c['extra']})"
     )
+    rules = r["rules"]
+    print(
+        f"rules: precision {rules['precision']:.2f}  recall {rules['recall']:.2f}  F1 {rules['f1']:.2f}  "
+        f"found {rules['found']}  missed {rules['missed']}  extra {rules['extra']}"
+    )
 
 
 def main():
@@ -206,7 +239,10 @@ def main():
     for r in results:
         print_result(r)
     if len(results) > 1:
-        print("\nsummary: " + "  ".join(f"{r['system']}: F1 {r['f1']:.2f}" for r in results))
+        print(
+            "\nsummary: "
+            + "  ".join(f"{r['system']}: F1 {r['f1']:.2f} rules F1 {r['rules']['f1']:.2f}" for r in results)
+        )
 
 
 if __name__ == "__main__":
