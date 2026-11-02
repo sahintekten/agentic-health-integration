@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from agents import config
+from agents import config, csharp_layout
 from agents.llm import LLMError, complete
 
 TEMPLATES = Path(__file__).parent / "templates" / "dotnet"
@@ -116,7 +116,7 @@ def _write_template(src, dest, subs):
 
 def write_templates(system, profile, mapping):
     out = config.generated_dir() / system
-    for name in ("global.json", "Directory.Build.props"):
+    for name in ("global.json", "Directory.Build.props", ".editorconfig"):
         shutil.copy(TEMPLATES / name, config.generated_dir() / name)
     tool = config.generated_dir() / "tools" / "FhirCheck"
     tool.mkdir(parents=True, exist_ok=True)
@@ -156,7 +156,7 @@ def write_templates(system, profile, mapping):
 
 def _context(system, profile, mapping_text):
     cheatsheet = (config.FHIR_REF / "firely_cheatsheet.cs").read_text()
-    id_policy = (config.FHIR_REF / "id_policy.md").read_text()
+    id_policy = (config.FHIR_REF / "id_policy.md").read_text() + "\n" + (config.FHIR_REF / "data_policy.md").read_text()
     contract = (TEMPLATES / "src" / "SourceModel.cs").read_text()
     source = {"tables": profile["tables"], "how_records_look": profile["note"]}
     return (
@@ -203,6 +203,7 @@ def run(system):
             raise LLMError(f"the model did not return {name}")
         (out / "tests" / name).write_text(_strip_code(tests[name]) + "\n")
 
+    csharp_layout.tidy(out, LLM_FILES)
     (out / "README.md").write_text(_readme(system, profile, resources))
     meta = {
         "system": system,
