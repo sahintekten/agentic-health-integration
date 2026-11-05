@@ -65,6 +65,14 @@ def _run(cmd, cwd, timeout=900):
 # ---------- checks ----------
 
 
+def _source_line(path, number):
+    """The text of the line a compiler error points at. Models are poor at counting lines."""
+    try:
+        return path.read_text().splitlines()[number - 1].strip()[:200]
+    except (OSError, IndexError):
+        return ""
+
+
 def check_build(out):
     code, text = _run(["dotnet", "build", "tests/Adapter.Tests.csproj", "-nologo", "-v", "q", "-clp:NoSummary"], out)
     errors, seen = [], set()
@@ -73,7 +81,15 @@ def check_build(out):
         if key not in seen:
             seen.add(key)
             file = m["file"].split(f"generated/{out.name}/")[-1]
-            errors.append({"file": file, "line": int(m["line"]), "code": m["code"], "message": m["msg"][:300]})
+            errors.append(
+                {
+                    "file": file,
+                    "line": int(m["line"]),
+                    "code": m["code"],
+                    "message": m["msg"][:300],
+                    "source": _source_line(out / file, int(m["line"])),
+                }
+            )
     if code != 0 and not errors:
         errors.append({"file": "?", "line": 0, "code": "build", "message": text.strip()[-800:]})
     return {"ok": code == 0, "errors": errors[:40], "error_count": len(errors)}
