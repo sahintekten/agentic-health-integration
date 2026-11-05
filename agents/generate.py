@@ -27,6 +27,7 @@ RULES = """- Follow mapping.yaml: implement every mapping item that has a resour
 - Never throw on bad data: skip the value, or skip the record and count it.
 - No logging and no Console output. Never put patient values in exception messages.
 - Do not use the non-generic type name Task (it clashes with Hl7.Fhir.Model.Task).
+- Write every regular expression as a verbatim string, @"\\s+" style. A normal string such as "\\s+" does not compile.
 - Readable code: one small method per resource and short comments where a data rule is applied."""
 
 MAPPER_PROMPT = f"""You write C# 12 code for .NET 8 with the Firely SDK 6.8 (package Hl7.Fhir.R4).
