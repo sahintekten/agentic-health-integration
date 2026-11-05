@@ -5,6 +5,7 @@ openapi.yaml and id_strategy.md in the same folder.
 """
 
 import json
+import re
 from datetime import datetime, timezone
 
 import yaml
@@ -158,6 +159,26 @@ def _mapping_items(mappings):
             yield None, item
 
 
+_QUALIFIED = re.compile(r"^[A-Z][A-Za-z]+[.\[]")
+
+
+def qualify_paths(mapping):
+    """Make every mapping path start with its resource name (Encounter.status, not status).
+
+    Some models write the path relative to the resource and put the name in "resource".
+    The paths are compared as text later, so they must all have the same form.
+    """
+    for _, item in _mapping_items(mapping.get("mappings")):
+        resource, path = item.get("resource"), item.get("path")
+        if not (resource and path):
+            continue
+        parts = re.split(r"(\s+and\s+)", str(path))
+        item["path"] = "".join(
+            part if (i % 2 or _QUALIFIED.match(part.strip())) else f"{resource}.{part.strip()}"
+            for i, part in enumerate(parts)
+        )
+
+
 def unmapped_fields(profile, mapping):
     mapped = set()
     for table, item in _mapping_items(mapping.get("mappings")):
@@ -281,6 +302,7 @@ def run(system):
     mapping.setdefault("system", profile["name"])
     mapping.setdefault("fhir_version", "R4")
     mapping.setdefault("mappings", [])
+    qualify_paths(mapping)
     mapping["generated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     missing = unmapped_fields(profile, mapping)
     if missing:
