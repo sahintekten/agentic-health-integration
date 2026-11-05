@@ -539,11 +539,11 @@ def _markdown(system, n, result):
     return "\n".join(lines) + "\n"
 
 
-def run(system, out=None, repair=True, report_name="validate"):
+def run(system, out=None, heal=True, report_name="validate"):
     """Check the adapter in `out` (default generated/<system>). Without repair it runs one round."""
     work = config.system_dir(system)
     out = out or config.generated_dir() / system
-    if repair and not (out / "src" / "Mapper.cs").exists():
+    if heal and not (out / "src" / "Mapper.cs").exists():
         raise SystemExit(f"{out} has no generated code. Run the generate step first.")
     report_dir = work / report_name
     report_dir.mkdir(parents=True, exist_ok=True)
@@ -556,7 +556,7 @@ def run(system, out=None, repair=True, report_name="validate"):
     _run(["dotnet", "build", "tools/FhirCheck", "-nologo", "-v", "q"], config.generated_dir())
 
     rounds = []
-    rounds_allowed = MAX_ROUNDS if repair else 1
+    rounds_allowed = MAX_ROUNDS if heal else 1
     for n in range(1, rounds_allowed + 1):
         result = {"round": n, "build": check_build(out)}
         if result["build"]["ok"]:
@@ -575,7 +575,7 @@ def run(system, out=None, repair=True, report_name="validate"):
             result["phi"] = check_phi(system, out, profile, log_text)
         stage, problems = _first_problems(result)
         result["passed"] = stage is None
-        if stage and repair and n < MAX_ROUNDS:
+        if stage and heal and n < MAX_ROUNDS:
             result["repair"] = {"stage": stage, **repair(system, out, stage, problems, n)}
         (report_dir / f"round_{n}.json").write_text(json.dumps(result, indent=1, default=str))
         (report_dir / f"round_{n}.md").write_text(_markdown(system, n, result))

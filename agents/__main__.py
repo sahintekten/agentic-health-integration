@@ -88,7 +88,7 @@ def main(argv=None):
         return 0
     if args.command == "validate-baseline":
         result = validate.run(
-            args.system, out=config.ROOT / "baseline" / args.system, repair=False, report_name="baseline_validate"
+            args.system, out=config.ROOT / "baseline" / args.system, heal=False, report_name="baseline_validate"
         )
         print(validate.summarise(result))
         return 0 if result["status"] == "passed" else 1
