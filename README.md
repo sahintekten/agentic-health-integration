@@ -73,7 +73,7 @@ Set `LLM_PROVIDER` in `.env`:
 | `github_models` | Retired by GitHub on 2026-07-30. Kept only so an old setting gives a clear error. |
 | `claude_code` | Runs the local `claude -p` command. For development only. It needs the Claude Code CLI installed and logged in. It runs with no tools in an empty folder. |
 | `anthropic` | Uses `ANTHROPIC_API_KEY`. Not tested yet. |
-| `azure_openai` | Uses the `AZURE_OPENAI_*` keys. Not tested yet. |
+| `azure_openai` | Uses the `AZURE_OPENAI_*` settings. Tested with `gpt-5-mini` (strong, in `AZURE_OPENAI_DEPLOYMENT`) and `gpt-4.1-mini` (fast, in `AZURE_OPENAI_DEPLOYMENT_MINI`), both as GlobalStandard deployments in Switzerland North. Reasoning models get no temperature, and rate limit replies (429) are retried. A first run of System D with these two models did not pass validation (the repaired tests still did not compile). |
 
 Set `LLM_CACHE=0` to turn the cache off.
 
