@@ -52,7 +52,7 @@ def run_system(system, steps, auto):
             review.stamp(system, "generate", auto=True)
             continue
         else:
-            result = _timed(system, step, lambda: validate.run(system))
+            result = _timed(system, step, lambda: validate.run(system, auto=auto))
             show = lambda: validate.summarise(result)  # noqa: E731
         progress.emit(system, step, "waiting for review", show().splitlines()[0][:160])
         if not review.ask(system, step, show, auto):

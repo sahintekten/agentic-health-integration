@@ -9,6 +9,7 @@ errors in the generated tests, but it may never delete or weaken a test.
 Reports go to workspace/<system>/validate/round_<n>.json and .md.
 """
 
+import difflib
 import json
 import os
 import re
@@ -22,7 +23,7 @@ import httpx
 import psycopg
 import yaml
 
-from agents import config, csharp_layout, generate, progress
+from agents import config, csharp_layout, generate, progress, review
 from agents.inventory.csvfiles import read_export
 from agents.inventory.values import SUSPICIOUS
 from agents.llm import LLMError, complete
@@ -42,6 +43,10 @@ Return one JSON object: {{"files": {{"src/Mapper.cs": "<the full new file>"}}, "
 - Always fix the adapter code in src/Mapper.cs.
 - Only when the check is "build" and a compile error is inside a test file, you may also return that test
   file ("tests/MappingTests.cs" or "tests/DataRulesTests.cs") with the compile error fixed.
+- Only when the check is "tests" and a failing test expects something that mapping.yaml and data_rules do not
+  support (or feeds it input that is not valid data), you may also return that test file with only that
+  expectation or input changed. A person will read your change and must approve it. Prefer fixing
+  src/Mapper.cs when the test is reasonable. Say in "notes" which test you changed and why.
 - Only when the check is "phi" and a test file holds real patient values, you may also return that test file
   with those values replaced by invented ones (and the expected values changed to match). Keep every test.
 - You must NOT delete tests, remove or loosen assertions, or add Skip. Tests describe the wanted behaviour.
@@ -467,15 +472,70 @@ def _test_strength(text):
     return text.count("[Fact]") + text.count("[Theory]"), text.count("Assert.")
 
 
-def repair(system, out, stage, problems, round_no):
+def _failing_test_files(problems):
+    """Test files that hold a failing test. Test names look like Adapter.Tests.DataRulesTests.Method."""
+    files = set()
+    for failure in (problems.get("problems") or []) if isinstance(problems, dict) else []:
+        parts = str(failure.get("test", "")).split(".") if isinstance(failure, dict) else []
+        if len(parts) >= 2 and f"tests/{parts[-2]}.cs" in TEST_FILES:
+            files.add(f"tests/{parts[-2]}.cs")
+    return files
+
+
+def ask_test_edit(name, before, after, notes):
+    """Show a proposed test change to a person. Anything but y/yes means no."""
+    diff = list(
+        difflib.unified_diff(before.splitlines(), after.splitlines(), name, name + " (proposed)", lineterm="", n=1)
+    )
+    print(f"\nThe repair step wants to change {name}:")
+    print("\n".join(diff[:80]) + ("\n..." if len(diff) > 80 else ""))
+    print(f"Reason given: {notes or 'none'}")
+    try:
+        return input("Apply this test change? [y/n] ").strip().lower() in ("y", "yes")
+    except EOFError:
+        return False
+
+
+def apply_repair(out, new_files, current, bad_tests, reviewable, approve=None, notes=""):
+    """Write the files the repair step returned, after the safety checks. Returns (changed, refused, test_edits)."""
+    changed, refused, test_edits = [], [], []
+    for name, text in new_files.items():
+        if name not in EDITABLE:
+            refused.append(f"{name}: not editable")
+            continue
+        if name in TEST_FILES:
+            if name not in bad_tests | reviewable:
+                refused.append(f"{name}: tests can only change to fix a compile error or real patient values")
+                continue
+            before, after = _test_strength(current[name]), _test_strength(text)
+            if after[0] < before[0] or after[1] < before[1] or "Skip" in text:
+                refused.append(f"{name}: change would remove tests or assertions")
+                continue
+            if name in reviewable and name not in bad_tests:
+                if approve is None:
+                    refused.append(f"{name}: a test change needs a person to approve it (run without --yes)")
+                    continue
+                if not approve(name, current[name], text, notes):
+                    refused.append(f"{name}: test change not approved")
+                    continue
+                test_edits.append({"file": name, "reason": notes[:300], "approved_by": review._reviewer()})
+        (out / name).write_text(generate._strip_code(text) + "\n")
+        changed.append(name)
+    return changed, refused, test_edits
+
+
+def repair(system, out, stage, problems, round_no, approve=None):
     files = {"src/Mapper.cs": (out / "src/Mapper.cs").read_text()}
+    reviewable = set()
     if stage == "build":
         bad_tests = {e["file"] for e in problems if isinstance(e, dict)} & set(TEST_FILES)
     elif stage == "phi":
         bad_tests = {f for f in TEST_FILES if any(str(p).startswith(f) for p in problems["problems"])}
     else:
         bad_tests = set()
-    for f in bad_tests:
+        if stage == "tests":
+            reviewable = _failing_test_files(problems)
+    for f in bad_tests | reviewable:
         files[f] = (out / f).read_text()
     profile = generate._profile(system)
     context = generate._context(system, profile, (config.system_dir(system) / "mapping.yaml").read_text())
@@ -491,27 +551,18 @@ def repair(system, out, stage, problems, round_no):
         purpose=f"validate {system} fix round {round_no} {stage}",
     )
     try:
-        new_files = json.loads(reply).get("files") or {}
+        data = json.loads(reply)
     except json.JSONDecodeError as exc:
         raise LLMError(f"the repair reply was not valid JSON: {exc}") from None
-    changed, refused = [], []
-    for name, text in new_files.items():
-        if name not in EDITABLE:
-            refused.append(f"{name}: not editable")
-            continue
-        if name in TEST_FILES:
-            if name not in bad_tests:
-                refused.append(f"{name}: tests can only change to fix a compile error or real patient values")
-                continue
-            before, after = _test_strength(files[name]), _test_strength(text)
-            if after[0] < before[0] or after[1] < before[1] or "Skip" in text:
-                refused.append(f"{name}: change would remove tests or assertions")
-                continue
-        (out / name).write_text(generate._strip_code(text) + "\n")
-        changed.append(name)
+    changed, refused, test_edits = apply_repair(
+        out, data.get("files") or {}, files, bad_tests, reviewable, approve, str(data.get("notes") or "")
+    )
     if changed:
         csharp_layout.tidy(out, changed)
-    return {"changed": changed, "refused": refused}
+    result = {"changed": changed, "refused": refused}
+    if test_edits:
+        result["test_edits"] = test_edits
+    return result
 
 
 # ---------- loop ----------
@@ -546,6 +597,8 @@ def _markdown(system, n, result):
             lines.append(f"- {stage}: {'ok' if s['ok'] else 'failed'} ({len(s.get('problems', []))} problems)")
     if result.get("repair"):
         lines.append(f"- repair: changed {result['repair']['changed']}, refused {result['repair']['refused']}")
+        for edit in result["repair"].get("test_edits", []):
+            lines.append(f"- test changed with approval of {edit['approved_by']}: {edit['file']} ({edit['reason']})")
     lines.append("")
     for stage in ("contract", "phi", "reconciliation"):
         for p in (result.get(stage) or {}).get("problems", [])[:10]:
@@ -555,7 +608,7 @@ def _markdown(system, n, result):
     return "\n".join(lines) + "\n"
 
 
-def run(system, out=None, heal=True, report_name="validate"):
+def run(system, out=None, heal=True, report_name="validate", auto=False):
     """Check the adapter in `out` (default generated/<system>). Without repair it runs one round."""
     work = config.system_dir(system)
     out = out or config.generated_dir() / system
@@ -592,7 +645,10 @@ def run(system, out=None, heal=True, report_name="validate"):
         stage, problems = _first_problems(result)
         result["passed"] = stage is None
         if stage and heal and n < MAX_ROUNDS:
-            result["repair"] = {"stage": stage, **repair(system, out, stage, problems, n)}
+            result["repair"] = {
+                "stage": stage,
+                **repair(system, out, stage, problems, n, None if auto else ask_test_edit),
+            }
         (report_dir / f"round_{n}.json").write_text(json.dumps(result, indent=1, default=str))
         (report_dir / f"round_{n}.md").write_text(_markdown(system, n, result))
         rounds.append(result)
@@ -612,6 +668,7 @@ def run(system, out=None, heal=True, report_name="validate"):
         "tests_total": tests["total"],
         "tests_passed": tests["passed"],
         "test_pass_rate": round(tests["passed"] / tests["total"], 3) if tests["total"] else 0.0,
+        "approved_test_edits": sum(len((r.get("repair") or {}).get("test_edits", [])) for r in rounds),
         "checks": {s: (final.get(s) or {}).get("ok") for s in ("build", "tests", "contract", "phi", "reconciliation")},
     }
     (report_dir / "summary.json").write_text(json.dumps(summary, indent=1))
@@ -620,7 +677,9 @@ def run(system, out=None, heal=True, report_name="validate"):
 
 def summarise(summary):
     checks = ", ".join(f"{k} {'ok' if v else 'FAILED' if v is False else '-'}" for k, v in summary["checks"].items())
+    edits = summary.get("approved_test_edits", 0)
+    note = f", {edits} test edit(s) approved by a person" if edits else ""
     return (
         f"System {summary['system']}: validation {summary['status']} after {summary['rounds']} round(s), "
-        f"{summary['repairs']} repair(s)\n  tests {summary['tests_passed']}/{summary['tests_total']}\n  {checks}"
+        f"{summary['repairs']} repair(s){note}\n  tests {summary['tests_passed']}/{summary['tests_total']}\n  {checks}"
     )
