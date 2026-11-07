@@ -9,7 +9,7 @@ export
 
 .PHONY: help venv hooks data synthea transform up down seed smoke test replay-adt send-adt lint \
 	discover design agents score generate validate pipeline metrics up-adapters \
-	demo-add-system demo-reset validate-baseline dashboard gateway-test diagram
+	demo-add-system demo-reset dashboard gateway-test diagram
 
 help:
 	@echo "make data         run Synthea (if needed) and build the seed files"
@@ -32,7 +32,6 @@ help:
 	@echo "make dashboard    start the dashboard on http://localhost:8050"
 	@echo "make demo-add-system SYSTEM=d   live demo: add a new system with review prompts"
 	@echo "make demo-reset SYSTEM=d        remove the demo system again"
-	@echo "make validate-baseline SYSTEM=a run the validator on the hand-written baseline"
 	@echo "make lint         run all pre-commit checks"
 	@echo "make hooks        install the git hooks"
 
@@ -102,9 +101,6 @@ demo-add-system: venv
 
 demo-reset: venv
 	$(VENV)/bin/python -m agents demo-reset --system $(SYSTEM)
-
-validate-baseline: venv
-	$(VENV)/bin/python -m agents validate-baseline --system $(SYSTEM)
 
 dashboard: venv
 	$(VENV)/bin/uvicorn dashboard.app:app --port 8050

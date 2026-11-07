@@ -11,7 +11,7 @@ Hospitals have many old systems that do not talk to each other. Each one stores 
 - Phase 1 is done: the repo, the synthetic data and three mock hospital systems.
 - Phase 2 is done: the LLM layer, the Discover agent, the Design agent, a review step and a scorer.
 - Phase 3 is done: data rules in Design, the Generate agent (.NET 8 adapters) and the Validate agent, for systems A, B and C.
-- Phase 4 is done: a FHIR gateway with a patient index, a dashboard, a live demo that adds System D, and a harness for a hand-written baseline.
+- Phase 4 is done: a FHIR gateway with a patient index, a dashboard, a live demo that adds System D.
 
 ## How the agents work
 
@@ -61,8 +61,6 @@ make dashboard                  # http://localhost:8050
 make demo-add-system SYSTEM=d   # the live demo
 ```
 
-**Baseline.** `baseline/` is for a hand-written adapter for System A, so we can compare it with the generated one. `make validate-baseline SYSTEM=a` runs the same checks on it. See [baseline/README.md](baseline/README.md).
-
 ### LLM providers
 
 Set `LLM_PROVIDER` in `.env`:
@@ -92,7 +90,6 @@ Set `LLM_CACHE=0` to turn the cache off.
 | `generated` | The .NET 8 adapters written by the Generate agent, one folder per system, plus a FHIR check tool. |
 | `gateway` | The FHIR gateway with the patient index. |
 | `dashboard` | The dashboard (FastAPI, plain HTML). |
-| `baseline` | The harness for a hand-written adapter. |
 | `docs` | The architecture diagram. |
 | `tests` | Smoke tests for the three systems, and the eval guard test. |
 

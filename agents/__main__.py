@@ -74,7 +74,6 @@ def main(argv=None):
         ("demo", "run the pipeline with review prompts, start the adapter and register it"),
         ("demo-reset", "remove a demo system again"),
         ("register", "register an adapter in the gateway"),
-        ("validate-baseline", "run the validator checks on the hand-written baseline"),
     ]:
         p = sub.add_parser(name, help=text)
         p.add_argument("--system", required=True, choices=list(config.SYSTEMS))
@@ -86,12 +85,6 @@ def main(argv=None):
     if args.command == "demo-reset":
         print(demo.reset(args.system))
         return 0
-    if args.command == "validate-baseline":
-        result = validate.run(
-            args.system, out=config.ROOT / "baseline" / args.system, heal=False, report_name="baseline_validate"
-        )
-        print(validate.summarise(result))
-        return 0 if result["status"] == "passed" else 1
     if args.command == "demo":
         watch = demo.Stopwatch()
         if not run_system(args.system, PIPELINE, auto=False):
