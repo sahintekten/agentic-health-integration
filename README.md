@@ -71,7 +71,7 @@ Set `LLM_PROVIDER` in `.env`:
 | `github_models` | Retired by GitHub on 2026-07-30. Kept only so an old setting gives a clear error. |
 | `claude_code` | Runs the local `claude -p` command. For development only. It needs the Claude Code CLI installed and logged in. It runs with no tools in an empty folder. |
 | `anthropic` | Uses `ANTHROPIC_API_KEY`. Not tested yet. |
-| `azure_openai` | Uses the `AZURE_OPENAI_*` settings. Tested with `gpt-5-mini` (strong, in `AZURE_OPENAI_DEPLOYMENT`) and `gpt-4.1-mini` (fast, in `AZURE_OPENAI_DEPLOYMENT_MINI`), both as GlobalStandard deployments in Switzerland North. Reasoning models get no temperature, and rate limit replies (429) are retried. A run of System D with these models passed the build, contract, PHI and reconciliation checks, but one of its 22 generated tests stayed red, so validation did not pass. |
+| `azure_openai` | Uses the `AZURE_OPENAI_*` settings. Tested with `gpt-5-mini` (strong, in `AZURE_OPENAI_DEPLOYMENT`) and `gpt-4.1-mini` (fast, in `AZURE_OPENAI_DEPLOYMENT_MINI`), both as GlobalStandard deployments in Switzerland North. Reasoning models get no temperature, and rate limit replies (429) are retried. Full pipeline runs of System D with these models passed 21 of the 22 generated tests. A Validate-only rerun with the same models passed all 22. LLM output varies between runs. |
 
 Set `LLM_CACHE=0` to turn the cache off.
 
@@ -158,6 +158,12 @@ All patients come from [Synthea](https://github.com/synthetichealth/synthea), a 
 ## Config
 
 Copy `.env.example` to `.env` and fill in the keys you need. `.env` is in `.gitignore`. Never commit it.
+
+## AI tools used
+
+- Inside the product: Gemini (the default provider), Azure OpenAI (`gpt-5-mini` and `gpt-4.1-mini`) and Claude Code (a provider for development only). You choose one with `LLM_PROVIDER`.
+- To build it: Gemini, Azure OpenAI and Claude Code.
+- All data is synthetic (made with Synthea), and a person approves every pipeline step.
 
 ## Working on the repo
 
