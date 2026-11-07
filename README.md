@@ -4,6 +4,8 @@
 
 This is our project for the EXL x UCD Data & AI Hackathon 2026, Challenge 01: Agentic healthcare integration.
 
+Demo video (under 3 minutes): https://drive.google.com/file/d/1nH83Is4Ytk3B99hskQQlKEDWBsLvyRXR/view?usp=sharing
+
 Hospitals have many old systems that do not talk to each other. Each one stores patients, lab results and visits in its own way. Our goal is a set of AI agents that look at these systems, work out what the data means, map it to HL7 FHIR R4, and then write .NET 8 adapter code with tests.
 
 ## Status
